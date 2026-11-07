@@ -1,6 +1,6 @@
 # WebCar — kontekst projektu
 
-Stan: 3 listopada 2026 · wersja dokumentu 2.14
+Stan: 7 listopada 2026 · wersja dokumentu 2.15
 
 ## 0. Jak korzystać z tego dokumentu
 
@@ -35,7 +35,7 @@ Praca inżynierska na studiach informatycznych, zespół czteroosobowy (Piotrek,
 
 Cel: zdalnie sterowany model samochodu z rozbudowaną elektroniką, sterowany z aplikacji na iPhonie przez WiFi, z podglądem wideo i telemetrią.
 
-Etap: sprzęt w trakcie montażu i testów podzespołów; schemat płytki głównej gotowy; działa blokujący program testowy (sekcja 6). Kod aplikacji nie istnieje. Istnieją makiety ekranów (sekcja 11).
+Etap: sprzęt w trakcie montażu i testów podzespołów; schemat płytki głównej gotowy; działa blokujący program testowy (sekcja 6). Projekt aplikacji założony 7 XI (Expo SDK 58): wszystkie ekrany istnieją jako zaślepki, logika jeszcze nie — stan prac w sekcji 8. Istnieją makiety ekranów (sekcja 11).
 
 ## 2. Platforma sprzętowa
 
@@ -407,6 +407,47 @@ Wszystkie te biblioteki działają w Expo Go, więc do pisania i testowania wyst
 
 - **Dostęp do sieci lokalnej.** Od iOS 14 łączenie z urządzeniami w sieci lokalnej wymaga zgody użytkownika i opisu `NSLocalNetworkUsageDescription`. Expo Go ma go u siebie; w development buildzie trzeba go dodać w `app.json` (`ios.infoPlist`).
 - **Połączenia nieszyfrowane (`ws://`, `http://`).** W development buildzie potrzebny jest wyjątek App Transport Security: `NSAppTransportSecurity → NSAllowsLocalNetworking: true` (w `ios.infoPlist`). W Expo Go zwykle działa bez konfiguracji; problem ujawnia się dopiero w buildzie.
+
+### Projekt aplikacji (założony 7 XI 2026, zadanie W1)
+
+| Element | Wersja / ustalenie |
+|---|---|
+| Expo SDK | 58 (React Native 0.88, React 19.3, TypeScript 6) — Expo Go na iPhonie musi obsługiwać SDK 58 |
+| Node.js | wersja LTS, co najmniej 22.13; oboje programiści używają tej samej wersji głównej |
+| Repozytorium | `Piotr154/webCar` na GitHubie; aplikacja w katalogu głównym repo |
+| Ekrany | `app/` w katalogu głównym (nie `src/app/`, jak w nowym szablonie Expo) — zgodnie z planem pracy |
+| Pozostały kod | `src/` (`components`, `connection`, `drive`, `db`, `state`), import przez alias `@/`, np. `@/components/ScreenStub` |
+| Symulator auta | `tools/mock-car/` (zadanie A2) |
+| Formatowanie | Prettier (`singleQuote`), formatowanie przy zapisie w VS Code (`.vscode/settings.json`) |
+| `app.json` | `orientation: default` (pion blokuje kod), `userInterfaceStyle: dark`, `supportsTablet: false`, wpisy z „Pułapek iOS” już dodane |
+
+Uruchomienie (szczegóły w `README.md`): `npm install` po każdej zmianie `package.json`, potem `npx expo start`. Biblioteki instalujemy przez `npx expo install <paczka>` (dobiera wersję zgodną z Expo Go), nigdy `npm audit fix --force`.
+
+Doświadczenia z konfiguracji:
+
+- Gdy telefon nie łączy się z Makiem w tej samej sieci WiFi (np. sieć blokuje ruch między urządzeniami), działa `npx expo start --tunnel`. Od SDK 58 tunel wymaga zalogowania: `npx expo login` na komputerze i to samo konto w Expo Go.
+- Expo Go potrzebuje zgody na sieć lokalną (iPhone: Ustawienia → Prywatność i ochrona → Sieć lokalna). Bez niej nie połączy się z Metro ani z ESP32.
+- Komunikat `Unable to run simctl` przy `npx expo start` dotyczy symulatora iOS z Xcode — nie używamy go, można ignorować.
+
+### Stan prac aplikacji — Sprint 1 (2–15 XI)
+
+Stan na 7 XI. Zadania i ich opis: plan Sprintu 1 (`context/WebCar_aplikacja_mobilna_podzial_pracy_i_plan_Sprintu_1.pdf`). A = Piotrek (jazda i łączność), B = Jagoda (profile, ustawienia, wygląd).
+
+| ID | Zadanie | Kto | Stan |
+|---|---|---|---|
+| W1 | Kickoff i setup projektu | A+B | prawie gotowe: projekt, biblioteki, `app.json`, foldery, Prettier. Zostało: PR z gałęzi `w1-setup` do `main`, uruchomienie u Piotrka z czystego `git clone`, tablica GitHub Projects |
+| W2 | Protokół v1 z Wojtasem i Wojtkiem | A+B | do zrobienia (termin 4 XI minął) — sekcja 9 nadal [PROPOZYCJA] |
+| W3 | Test hotspot + ESP32 + aplikacja | A+B | czeka na firmware (12–14 XI) |
+| A1–A8 | typy i config, symulator, łączność, ping, provider, sync, prototyp jazdy, testy | A | nierozpoczęte |
+| B1 | Czcionki i test kursywy | B | paczki zainstalowane; ładowanie czcionek, test na iPhonie i `Typography.tsx` do zrobienia |
+| B2 | Motyw `theme.ts` | B | do zrobienia |
+| B3 | Nawigacja i ekrany-zaślepki | B | częściowo: `_layout.tsx` ze `Stack`, `GestureHandlerRootView` i `StatusBar`; zaślepki wszystkich ekranów (`ScreenStub`, tymczasowa lista ekranów na Home). Zostało: opcje tras (`menu` jako `transparentModal` + `fade`, `drive` z `gestureEnabled: false`), blokada pionu w `_layout`, płytki stos przy przejściach z menu |
+| B4 | SQLite i repozytorium profili | B | do zrobienia (potrzebne Piotrkowi do A6 ok. 11 XI) |
+| B5 | `ProfileProvider` i `useProfiles` | B | do zrobienia |
+| B6 | Komponenty bazowe | B | do zrobienia |
+| B7 | Ekran Menu (09) | B | do zrobienia |
+| B8 | Ekran Home (08, 08A) | B | do zrobienia |
+| B9 | Ekran `/dev` | B | do zrobienia, może poczekać (pierwszy do przesunięcia na Sprint 2) |
 
 ## 9. Protokół
 

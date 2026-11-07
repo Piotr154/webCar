@@ -1,0 +1,4 @@
+node_modules/
+.expo/
+context/
+package-lock.json
