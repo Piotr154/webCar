@@ -1,6 +1,6 @@
 # WebCar — kontekst projektu
 
-Stan: 7 listopada 2026 · wersja dokumentu 2.17
+Stan: 7 listopada 2026 · wersja dokumentu 2.18
 
 ## 0. Jak korzystać z tego dokumentu
 
@@ -433,7 +433,7 @@ Doświadczenia z konfiguracji:
 
 ### Stan prac aplikacji — Sprint 1 (2–15 XI)
 
-Stan na 7 XI. Zadania i ich opis: plan Sprintu 1 (`context/WebCar_aplikacja_mobilna_podzial_pracy_i_plan_Sprintu_1.pdf`). A = Piotrek (jazda i łączność), B = Jagoda (profile, ustawienia, wygląd).
+Stan na 7 XI, po scaleniu PR #1–#3 do `main`. Zadania i ich opis: plan Sprintu 1 (`context/WebCar_aplikacja_mobilna_podzial_pracy_i_plan_Sprintu_1.pdf`). A = Piotrek (jazda i łączność), B = Jagoda (profile, ustawienia, wygląd).
 
 | ID | Zadanie | Kto | Stan |
 |---|---|---|---|
@@ -441,7 +441,7 @@ Stan na 7 XI. Zadania i ich opis: plan Sprintu 1 (`context/WebCar_aplikacja_mobi
 | W2 | Protokół v1 z Wojtasem i Wojtkiem | A+B | do zrobienia (termin 4 XI minął) — sekcja 9 nadal [PROPOZYCJA] |
 | W3 | Test hotspot + ESP32 + aplikacja | A+B | czeka na firmware (12–14 XI) |
 | A1–A8 | typy i config, symulator, łączność, ping, provider, sync, prototyp jazdy, testy | A | nierozpoczęte |
-| B1 | Czcionki i test kursywy | B | zrobione na gałęzi `b/B1-fonts`: ładowanie czcionek, test na iPhonie (kursywa przez `skewX`), `Typography.tsx`; ekran `/dev` pokazuje `Heading`, `Label` i `Mono` |
+| B1 | Czcionki i test kursywy | B | scalone do `main` (PR #3): ładowanie czcionek, test na iPhonie (kursywa przez `skewX`), `Typography.tsx`; ekran `/dev` pokazuje `Heading`, `Label` i `Mono` |
 | B2 | Motyw `theme.ts` | B | scalone do `main` (PR #2): `src/theme.ts`, ekrany i `ScreenStub` używają `colors.*` i `space.*` |
 | B3 | Nawigacja i ekrany-zaślepki | B | częściowo: `_layout.tsx` ze `Stack`, `GestureHandlerRootView` i `StatusBar`; zaślepki wszystkich ekranów (`ScreenStub`, tymczasowa lista ekranów na Home). Zostało: opcje tras (`menu` jako `transparentModal` + `fade`, `drive` z `gestureEnabled: false`), blokada pionu w `_layout`, płytki stos przy przejściach z menu |
 | B4 | SQLite i repozytorium profili | B | do zrobienia (potrzebne Piotrkowi do A6 ok. 11 XI) |
