@@ -1,6 +1,6 @@
 # WebCar — kontekst projektu
 
-Stan: 7 listopada 2026 · wersja dokumentu 2.16
+Stan: 7 listopada 2026 · wersja dokumentu 2.17
 
 ## 0. Jak korzystać z tego dokumentu
 
@@ -417,6 +417,7 @@ Wszystkie te biblioteki działają w Expo Go, więc do pisania i testowania wyst
 | Repozytorium | `Piotr154/webCar` na GitHubie; aplikacja w katalogu głównym repo |
 | Ekrany | `app/` w katalogu głównym (nie `src/app/`, jak w nowym szablonie Expo) — zgodnie z planem pracy |
 | Pozostały kod | `src/` (`components`, `connection`, `drive`, `db`, `state`), import przez alias `@/`, np. `@/components/ScreenStub` |
+| Tekst | `src/components/Typography.tsx`: `Heading` (Saira Condensed, wielkie litery, pochylenie `skewX`), `Label` (JetBrains Mono 700, wielkie litery, rozstrzelenie), `Mono` (JetBrains Mono 500). `fontFamily` tylko w `Typography.tsx` i `theme.ts`. Czcionki ładuje `app/_layout.tsx`; ekran powitalny zostaje do końca ładowania |
 | Motyw | `src/theme.ts`: `colors`, `underglowColors`, `fonts`, `space`, `overlay`. W ekranach i komponentach kolory tylko przez `colors.*`, bez wartości hex. Nazwy różnią się od planu Sprintu 1: `colors.background` (w planie `bg`) i `colors.disabledBackground` (w planie `disabledBg`) |
 | Symulator auta | `tools/mock-car/` (zadanie A2) |
 | Formatowanie | Prettier (`singleQuote`), formatowanie przy zapisie w VS Code (`.vscode/settings.json`) |
@@ -436,12 +437,12 @@ Stan na 7 XI. Zadania i ich opis: plan Sprintu 1 (`context/WebCar_aplikacja_mobi
 
 | ID | Zadanie | Kto | Stan |
 |---|---|---|---|
-| W1 | Kickoff i setup projektu | A+B | zrobione na gałęzi `w1-setup`: projekt, biblioteki, `app.json`, foldery, Prettier. Zostało: przegląd i merge PR do `main`, uruchomienie u Piotrka z czystego `git clone`, tablica GitHub Projects |
+| W1 | Kickoff i setup projektu | A+B | scalone do `main` (PR #1): projekt, biblioteki, `app.json`, foldery, Prettier, ESLint. Zostało: uruchomienie u Piotrka z czystego `git clone`, tablica GitHub Projects |
 | W2 | Protokół v1 z Wojtasem i Wojtkiem | A+B | do zrobienia (termin 4 XI minął) — sekcja 9 nadal [PROPOZYCJA] |
 | W3 | Test hotspot + ESP32 + aplikacja | A+B | czeka na firmware (12–14 XI) |
 | A1–A8 | typy i config, symulator, łączność, ping, provider, sync, prototyp jazdy, testy | A | nierozpoczęte |
-| B1 | Czcionki i test kursywy | B | paczki zainstalowane; ładowanie czcionek, test na iPhonie i `Typography.tsx` do zrobienia |
-| B2 | Motyw `theme.ts` | B | zrobione na gałęzi `b/B2-theme` (PR zależy od W1): `src/theme.ts`, ekrany i `ScreenStub` używają `colors.*` i `space.*` |
+| B1 | Czcionki i test kursywy | B | zrobione na gałęzi `b/B1-fonts`: ładowanie czcionek, test na iPhonie (kursywa przez `skewX`), `Typography.tsx`; ekran `/dev` pokazuje `Heading`, `Label` i `Mono` |
+| B2 | Motyw `theme.ts` | B | scalone do `main` (PR #2): `src/theme.ts`, ekrany i `ScreenStub` używają `colors.*` i `space.*` |
 | B3 | Nawigacja i ekrany-zaślepki | B | częściowo: `_layout.tsx` ze `Stack`, `GestureHandlerRootView` i `StatusBar`; zaślepki wszystkich ekranów (`ScreenStub`, tymczasowa lista ekranów na Home). Zostało: opcje tras (`menu` jako `transparentModal` + `fade`, `drive` z `gestureEnabled: false`), blokada pionu w `_layout`, płytki stos przy przejściach z menu |
 | B4 | SQLite i repozytorium profili | B | do zrobienia (potrzebne Piotrkowi do A6 ok. 11 XI) |
 | B5 | `ProfileProvider` i `useProfiles` | B | do zrobienia |
@@ -501,7 +502,7 @@ Makiety to jeden statyczny plik HTML ze wszystkimi ekranami. Każdy stan ekranu 
 
 - **Wymiary trzeba przeskalować, a nie kopiować w punktach.** Ekran poziomy w makiecie ma 812×440, a iPhone 12–14 w poziomie ma 844×390 punktów (iPhone 15 ok. 852×393) — makieta jest o ok. 50 punktów wyższa niż prawdziwy ekran, więc po skopiowaniu wymiarów drążek i pedały wyszłyby poza ekran. Ekran pionowy w makiecie ma 372×844, iPhone 12–14 ma 390×844. Układ dopasowujemy do rzeczywistego rozmiaru ekranu, zachowując rozmieszczenie i proporcje elementów.
 - **Obszar bezpieczny (safe area).** Makiety nie uwzględniają wycięcia ekranu (notch / Dynamic Island) ani paska stanu. W poziomie wycięcie zasłania kilkadziesiąt punktów z boku, w pionie górne elementy (np. „HELLO KAROL”) trafiłyby pod pasek stanu. Aplikacja używa `react-native-safe-area-context` (`SafeAreaView` / `useSafeAreaInsets`).
-- **Czcionki:** Saira Condensed (700, kursywa) — nagłówki, wartości i przyciski; JetBrains Mono (500/700, wielkie litery) — etykiety i dane. Obie z Google Fonts (licencja OFL), dołączone do aplikacji. Saira Condensed nie ma wersji kursywnej — przeglądarka tylko pochyla zwykłą. Nie wiadomo, czy iOS w React Native zrobi to samo dla czcionki dołączonej do aplikacji — do sprawdzenia na samym początku pracy. Jeśli tekst wyjdzie prosty, obejście to pochylenie przez `transform: [{ skewX: '-10deg' }]`.
+- **Czcionki:** Saira Condensed (700, kursywa) — nagłówki, wartości i przyciski; JetBrains Mono (500/700, wielkie litery) — etykiety i dane. Obie z Google Fonts (licencja OFL), dołączone do aplikacji. Saira Condensed nie ma wersji kursywnej — przeglądarka tylko pochyla zwykłą. Sprawdzone na iPhonie 7 XI: iOS w React Native jej nie pochyla (`fontStyle: 'italic'` nic nie zmienia), więc nagłówki pochyla `transform: [{ skewX: '-10deg' }]` w komponencie `Heading` (`src/components/Typography.tsx`).
 - **Zaślepki:** pasiasty prostokąt „camera frame” to miejsce na strumień MJPEG z kamery (sekcja 8), a rysunek auta na ekranie głównym zostanie zastąpiony właściwym obrazkiem.
 
 ### Jazda — orientacja pozioma
