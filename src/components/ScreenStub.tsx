@@ -1,5 +1,3 @@
-// TYMCZASOWE: zaślepka ekranu do czasu, aż powstanie właściwy ekran.
-// Do usunięcia, gdy żaden ekran już jej nie używa.
 import { router } from 'expo-router';
 import type { ReactNode } from 'react';
 import { Pressable, StyleSheet, Text } from 'react-native';

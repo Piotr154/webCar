@@ -1,4 +1,3 @@
-// 08 Home — na razie zaślepka z listą wszystkich ekranów (zastąpią ją B7 Menu i B8 Home).
 import { Link } from 'expo-router';
 import { StyleSheet, Text } from 'react-native';
 

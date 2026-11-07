@@ -1,5 +1,4 @@
 node_modules/
 .expo/
 context/
-Claude outputs/
 package-lock.json
