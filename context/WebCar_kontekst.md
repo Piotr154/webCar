@@ -1,6 +1,6 @@
 # WebCar — kontekst projektu
 
-Stan: 7 listopada 2026 · wersja dokumentu 2.15
+Stan: 7 listopada 2026 · wersja dokumentu 2.16
 
 ## 0. Jak korzystać z tego dokumentu
 
@@ -417,6 +417,7 @@ Wszystkie te biblioteki działają w Expo Go, więc do pisania i testowania wyst
 | Repozytorium | `Piotr154/webCar` na GitHubie; aplikacja w katalogu głównym repo |
 | Ekrany | `app/` w katalogu głównym (nie `src/app/`, jak w nowym szablonie Expo) — zgodnie z planem pracy |
 | Pozostały kod | `src/` (`components`, `connection`, `drive`, `db`, `state`), import przez alias `@/`, np. `@/components/ScreenStub` |
+| Motyw | `src/theme.ts`: `colors`, `underglowColors`, `fonts`, `space`, `overlay`. W ekranach i komponentach kolory tylko przez `colors.*`, bez wartości hex. Nazwy różnią się od planu Sprintu 1: `colors.background` (w planie `bg`) i `colors.disabledBackground` (w planie `disabledBg`) |
 | Symulator auta | `tools/mock-car/` (zadanie A2) |
 | Formatowanie | Prettier (`singleQuote`), formatowanie przy zapisie w VS Code (`.vscode/settings.json`) |
 | `app.json` | `orientation: default` (pion blokuje kod), `userInterfaceStyle: dark`, `supportsTablet: false`, wpisy z „Pułapek iOS” już dodane |
@@ -435,12 +436,12 @@ Stan na 7 XI. Zadania i ich opis: plan Sprintu 1 (`context/WebCar_aplikacja_mobi
 
 | ID | Zadanie | Kto | Stan |
 |---|---|---|---|
-| W1 | Kickoff i setup projektu | A+B | prawie gotowe: projekt, biblioteki, `app.json`, foldery, Prettier. Zostało: PR z gałęzi `w1-setup` do `main`, uruchomienie u Piotrka z czystego `git clone`, tablica GitHub Projects |
+| W1 | Kickoff i setup projektu | A+B | zrobione na gałęzi `w1-setup`: projekt, biblioteki, `app.json`, foldery, Prettier. Zostało: przegląd i merge PR do `main`, uruchomienie u Piotrka z czystego `git clone`, tablica GitHub Projects |
 | W2 | Protokół v1 z Wojtasem i Wojtkiem | A+B | do zrobienia (termin 4 XI minął) — sekcja 9 nadal [PROPOZYCJA] |
 | W3 | Test hotspot + ESP32 + aplikacja | A+B | czeka na firmware (12–14 XI) |
 | A1–A8 | typy i config, symulator, łączność, ping, provider, sync, prototyp jazdy, testy | A | nierozpoczęte |
 | B1 | Czcionki i test kursywy | B | paczki zainstalowane; ładowanie czcionek, test na iPhonie i `Typography.tsx` do zrobienia |
-| B2 | Motyw `theme.ts` | B | do zrobienia |
+| B2 | Motyw `theme.ts` | B | zrobione na gałęzi `b/B2-theme` (PR zależy od W1): `src/theme.ts`, ekrany i `ScreenStub` używają `colors.*` i `space.*` |
 | B3 | Nawigacja i ekrany-zaślepki | B | częściowo: `_layout.tsx` ze `Stack`, `GestureHandlerRootView` i `StatusBar`; zaślepki wszystkich ekranów (`ScreenStub`, tymczasowa lista ekranów na Home). Zostało: opcje tras (`menu` jako `transparentModal` + `fade`, `drive` z `gestureEnabled: false`), blokada pionu w `_layout`, płytki stos przy przejściach z menu |
 | B4 | SQLite i repozytorium profili | B | do zrobienia (potrzebne Piotrkowi do A6 ok. 11 XI) |
 | B5 | `ProfileProvider` i `useProfiles` | B | do zrobienia |
