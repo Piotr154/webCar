@@ -1,7 +1,7 @@
+import { ScreenStub } from '@/components/ScreenStub';
+import { colors } from '@/theme';
 import { Link } from 'expo-router';
 import { StyleSheet, Text } from 'react-native';
-
-import { ScreenStub } from '@/components/ScreenStub';
 
 const SCREENS = [
   { href: '/drive', label: 'DRIVE' },
@@ -30,6 +30,6 @@ export default function HomeScreen() {
 }
 
 const styles = StyleSheet.create({
-  link: { color: '#f2f3f4', fontSize: 18, paddingVertical: 10 },
-  note: { color: '#8e9095', fontSize: 12, marginTop: 12 },
+  link: { color: colors.text, fontSize: 18, paddingVertical: 10 },
+  note: { color: colors.muted3, fontSize: 12, marginTop: 12 },
 });
