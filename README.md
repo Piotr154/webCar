@@ -69,4 +69,4 @@ Importy z `src/` przez alias `@/`, np. `import { ScreenStub } from '@/components
 
 - **W1 (7 XI 2026):** projekt z szablonu `create-expo-app` (Expo SDK 58). Ekrany zostają w `app/` w katalogu głównym,
   zgodnie z planem pracy — szablon domyślnie używa `src/app/`, ale cały plan i kontrakt odwołują się do `app/`.
-- **B1 — kursywa Saira Condensed:** do ustalenia (fontStyle italic czy skewX).
+- **B1 — kursywa Saira Condensed (7 XI 2026):** `fontStyle: 'italic'` nie działa na iOS (Saira nie ma wersji kursywnej), więc nagłówki są pochylone przez `transform: [{ skewX: '-10deg' }]` w komponencie `Heading` (`src/components/Typography.tsx`). `fontFamily` ustawiamy tylko w `Typography.tsx` i `theme.ts`.
