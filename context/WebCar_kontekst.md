@@ -1,6 +1,6 @@
 # WebCar — kontekst projektu
 
-Stan: 7 listopada 2026 · wersja dokumentu 2.18
+Stan: 8 listopada 2026 · wersja dokumentu 2.19
 
 ## 0. Jak korzystać z tego dokumentu
 
@@ -70,7 +70,7 @@ Wyjść BEC (6 V) i LM2596 (5 V) nigdy nie łączymy — wspólna jest tylko mas
 | GPIO | Sieć na schemacie | Element | Funkcja |
 |---|---|---|---|
 | 4 | ESC_SIG | ESC | PWM 1000 / 1500 / 2000 µs |
-| 5 | SERVO_SIG | serwo SG5010 | PWM: 1250 µs = pełny skręt w lewo, 1500 µs = prosto, 1750 µs = pełny w prawo |
+| 5 | SERVO_SIG | serwo SG5010 | PWM: 1250 µs = pełny skręt w lewo, 1500 µs = prosto, 1750 µs = pełny w prawo; wartości pośrednie proporcjonalnie do `s` z ramki `drv` (sekcja 9) |
 | 6 | LED → R2 330 Ω → LED_DIN | taśma WS2813 | dane, bez konwertera poziomów (sekcja 12) |
 | 7 | BUZZ | moduł buzzera aktywnego Iduino ST1143 | wł./wył., bezpośrednio z pinu (moduł ma własny tranzystor); jeden ton; pikanie przy cofaniu |
 | 8 / 9 | SDA / SCL | 2× VL53L0X | I²C wspólne |
@@ -192,10 +192,10 @@ Wyjaśnienia:
 
 ### Ekran jazdy (orientacja pozioma)
 
-**Skręt** — zero-jedynkowy: pełny w lewo / prosto / pełny w prawo, bez lekkiego skrętu. Dwa tryby (wybór w ustawieniach jazdy); logika trybów działa tylko w aplikacji — pojazd dostaje zawsze jedną z trzech wartości.
+**Skręt** — stopniowy: kąt kół jest proporcjonalny do wychylenia gałki drążka albo przechyłu telefonu (małe wychylenie = lekki skręt, maksymalne = pełny skręt). Dwa tryby (wybór w ustawieniach jazdy); logika trybów działa tylko w aplikacji — pojazd dostaje zawsze wartość `s` od −100 (pełny w lewo) do 100 (pełny w prawo), sekcja 9.
 
-- **STICK** — okrągły drążek po lewej stronie ekranu. Liczy się tylko wychylenie w poziomie; działa jak przełącznik trzypozycyjny: gałka w lewo = pełny skręt w lewo, w prawo = pełny w prawo, po puszczeniu wraca na środek = prosto. Ruch w pionie nic nie robi. Mała strefa martwa wokół środka (sekcja 12).
-- **GYRO** — skręt przechyłem telefonu jak kierownicą. Telefon trzymany poziomo (dłuższa krawędź równolegle do ziemi) = prosto; przechył w lewo/prawo poza próg = pełny skręt w tę stronę. Przechył liczony względem grawitacji (akcelerometr telefonu), więc pozycja „prosto" jest stała i nie wymaga kalibracji — nie zależy od tego, jak mocno ekran jest odchylony w stronę kierowcy. Próg ok. 15°, powrót na prosto poniżej ok. 10°, żeby koła nie drgały przy przechyle bliskim progu (sekcja 12). Ekran jazdy jest zablokowany w **jednej** orientacji poziomej (np. `LANDSCAPE_RIGHT`) — po obróceniu telefonu o 180° przechył w lewo dawałby odwrotny znak i auto skręcałoby w złą stronę.
+- **STICK** — okrągły drążek po lewej stronie ekranu. Liczy się tylko wychylenie w poziomie: w strefie martwej wokół środka `s` = 0, dalej `s` rośnie liniowo od 0 na skraju strefy martwej do ±100 na krawędzi drążka (bez skoku za strefą martwą). Gałka nie wychodzi poza obręcz drążka; po puszczeniu wraca na środek = prosto. Ruch w pionie nic nie robi. Strefa martwa w sekcji 12.
+- **GYRO** — skręt przechyłem telefonu jak kierownicą. Telefon trzymany poziomo (dłuższa krawędź równolegle do ziemi) = prosto. W strefie martwej (ok. 3°) `s` = 0, dalej `s` rośnie liniowo do ±100 przy przechyle ok. 30°; większy przechył nadal daje ±100. Odczyt jest lekko wygładzany (średnia z poprzednią wartością), żeby szum akcelerometru nie powodował drgania serwa (sekcja 12). Przechył liczony względem grawitacji (akcelerometr telefonu), więc pozycja „prosto" jest stała i nie wymaga kalibracji — nie zależy od tego, jak mocno ekran jest odchylony w stronę kierowcy. Ekran jazdy jest zablokowany w **jednej** orientacji poziomej (np. `LANDSCAPE_RIGHT`) — po obróceniu telefonu o 180° przechył w lewo dawałby odwrotny znak i auto skręcałoby w złą stronę.
 
 **Pedały FWD i REV** — rozpędzanie, zwalnianie, hamowanie i jazda wstecz (podsekcja niżej).
 
@@ -213,7 +213,7 @@ Wyjaśnienia:
 
 **Kamera** — obraz z kamery, napis CAMERA OFF, gdy kamera jest wyłączona w Drive settings, albo CAMERA CONNECTION LOST, gdy jest włączona, ale strumień nie działa (sekcja 3).
 
-**Kierunkowskazy** — automatyczne, bez przycisków na ekranie jazdy. Gdy pojazd skręca (`s` w ramce `drv` różne od 0), firmware miga kierunkowskazem po tej stronie; gdy koła wracają na prosto, kierunkowskaz gaśnie. Działa w obu trybach skrętu, także przy włączonym E-STOP, a przy failsafe gaśnie razem z powrotem kół na prosto. Przełącznik BLINKERS OFF/ON w Drive settings (zapisywany w profilu, pole `blk` w `cfg`) wyłącza tę funkcję [PROPOZYCJA: logika w firmware, bo firmware i tak zna skręt — aplikacja nie wysyła osobnych poleceń].
+**Kierunkowskazy** — automatyczne, bez przycisków na ekranie jazdy. Gdy pojazd wyraźnie skręca (|`s`| w ramce `drv` ≥ ok. 30), firmware miga kierunkowskazem po tej stronie; gdy skręt spadnie poniżej ok. 20 (np. koła wracają na prosto), kierunkowskaz gaśnie. Dwa progi (histereza) sprawiają, że drobne korekty toru nie włączają kierunkowskazu, a przy skręcie bliskim progu nie miga on na zmianę (sekcja 12). Działa w obu trybach skrętu, także przy włączonym E-STOP, a przy failsafe gaśnie razem z powrotem kół na prosto. Przełącznik BLINKERS OFF/ON w Drive settings (zapisywany w profilu, pole `blk` w `cfg`) wyłącza tę funkcję [PROPOZYCJA: logika w firmware, bo firmware i tak zna skręt — aplikacja nie wysyła osobnych poleceń].
 
 **Reflektory i światła tylne** — bez przycisków, sterowane automatycznie przez firmware: reflektory świecą stale, światła tylne tylko podczas jazdy wstecz (moc ujemna). Pojazd nie ma świateł stop.
 
@@ -315,7 +315,8 @@ Pojazd nie ma: czujnika prędkości ani obrotów, IMU/żyroskopu, pomiaru napię
 - pikanie buzzera przy cofaniu na podstawie tylnego czujnika (sekcja 4)
 - auto-stop przed przeszkodą z przodu przy włączonym tempomacie (sekcja 4)
 - światła automatyczne: reflektory stale (GPIO17), światła tylne przy jeździe wstecz (GPIO18)
-- kierunkowskazy automatyczne: miganie (GPIO15/16) po stronie skrętu z `drv.s`, gdy włączone w `cfg.blk`
+- kierunkowskazy automatyczne: miganie (GPIO15/16) po stronie skrętu z `drv.s` (włączenie przy |`s`| ≥ ok. 30, wyłączenie poniżej ok. 20), gdy włączone w `cfg.blk`
+- serwo skrętu: `s` −100…100 przeliczane liniowo na 1250…1750 µs (`1500 + s × 2,5`)
 - włączanie/wyłączanie podświetlenia na polecenie aplikacji
 - gaszenie podświetlenia po utracie połączenia z aplikacją: zamknięcie połączenia WebSocket albo brak jakiejkolwiek wiadomości od aplikacji przez ok. 2 s (aplikacja wysyła `ping` co ok. 0,5 s na każdym ekranie, sekcja 9)
 - ograniczenie maksymalnej jasności taśmy WS2813
@@ -433,11 +434,11 @@ Doświadczenia z konfiguracji:
 
 ### Stan prac aplikacji — Sprint 1 (2–15 XI)
 
-Stan na 7 XI, po scaleniu PR #1–#3 do `main`. Zadania i ich opis: plan Sprintu 1 (`context/WebCar_aplikacja_mobilna_podzial_pracy_i_plan_Sprintu_1.pdf`). A = Piotrek (jazda i łączność), B = Jagoda (profile, ustawienia, wygląd).
+Stan na 8 XI, po scaleniu PR #1–#4 do `main`. Zadania i ich opis: plan Sprintu 1 (`context/WebCar_aplikacja_mobilna_podzial_pracy_i_plan_Sprintu_1.md`). A = Piotrek (jazda i łączność), B = Jagoda (profile, ustawienia, wygląd).
 
 | ID | Zadanie | Kto | Stan |
 |---|---|---|---|
-| W1 | Kickoff i setup projektu | A+B | scalone do `main` (PR #1): projekt, biblioteki, `app.json`, foldery, Prettier, ESLint. Zostało: uruchomienie u Piotrka z czystego `git clone`, tablica GitHub Projects |
+| W1 | Kickoff i setup projektu | A+B | scalone do `main` (PR #1): projekt, biblioteki, `app.json`, foldery, Prettier, ESLint; uruchomienie u obojga z czystego `git clone` i tablica GitHub Projects — gotowe |
 | W2 | Protokół v1 z Wojtasem i Wojtkiem | A+B | do zrobienia (termin 4 XI minął) — sekcja 9 nadal [PROPOZYCJA] |
 | W3 | Test hotspot + ESP32 + aplikacja | A+B | czeka na firmware (12–14 XI) |
 | A1–A8 | typy i config, symulator, łączność, ping, provider, sync, prototyp jazdy, testy | A | nierozpoczęte |
@@ -457,13 +458,13 @@ Format: JSON, krótkie klucze, liczby całkowite. Cały protokół jest szkicem 
 
 Adresy: główny ESP32 — WebSocket `ws://172.20.10.13/ws` (port 80), Xiao `172.20.10.14` (strumień `http://172.20.10.14:81/stream`).
 
-Konwencje: moc dodatnia = do przodu, ujemna = do tyłu; skręt `-1` = pełny w lewo, `0` = prosto, `1` = pełny w prawo; odległości w cm; procenty 0–100. Konwencje i jednostki są zapisane tylko tutaj, a nie w ramkach. Każda zmiana protokołu = zmiana tej sekcji i podbicie wersji firmware (`fw` w `hello`).
+Konwencje: moc dodatnia = do przodu, ujemna = do tyłu; skręt `-100` = pełny w lewo, `0` = prosto, `100` = pełny w prawo, wartości pośrednie = skręt częściowy; odległości w cm; procenty 0–100. Konwencje i jednostki są zapisane tylko tutaj, a nie w ramkach. Każda zmiana protokołu = zmiana tej sekcji i podbicie wersji firmware (`fw` w `hello`).
 
 ### Aplikacja → pojazd
 
 | Wiadomość | Znaczenie |
 |---|---|
-| `{"t":"drv","g":34,"s":-1,"c":0}` | sterowanie, ok. 20 Hz, także przy włączonym tempomacie. `g` moc −100…100 (liczona w aplikacji wg tabeli pedałów), `s` skręt -1/0/1 (firmware: 1250/1500/1750 µs), `c` = 1 gdy tempomat włączony (włącza auto-stop z przodu). Limit mocy nakłada firmware |
+| `{"t":"drv","g":34,"s":-60,"c":0}` | sterowanie, ok. 20 Hz, także przy włączonym tempomacie. `g` moc −100…100 (liczona w aplikacji wg tabeli pedałów), `s` skręt −100…100, liczba całkowita (firmware liniowo: 1250…1750 µs, `1500 + s × 2,5`; wartości spoza zakresu obcina do ±100), `c` = 1 gdy tempomat włączony (włącza auto-stop z przodu). Limit mocy nakłada firmware |
 | `{"t":"act","a":"horn"}` | klakson — odtwarza dźwięk z `cfg.horn` (wybrany w profilu). Używają go przycisk HORN na ekranie jazdy i TEST HORN na ekranie Light & sound; przy autozapisie zaznaczony dźwięk jest już w `cfg.horn`, więc osobny numer pliku nie jest potrzebny |
 | `{"t":"act","a":"led","on":1}` | podświetlenie wł. (`1`) / wył. (`0`) — przycisk LED, podgląd na ekranie Light & sound, koniec sesji, synchronizacja |
 | `{"t":"act","a":"estop","on":1}` | włącza E-STOP (zatrzask w firmware); `"on":0` zwalnia. Dopóki jest włączony, firmware ignoruje moc z `drv` |
@@ -509,7 +510,7 @@ Makiety to jeden statyczny plik HTML ze wszystkimi ekranami. Każdy stan ekranu 
 
 Wspólne elementy: przycisk menu, imię kierowcy i czas sesji, wskaźnik jakości łącza (kafelek pod imieniem i czasem: cztery kreski i ping w ms, sekcja 3), obraz z kamery, CRUISE (nieaktywny przy mocy 0 i ujemnej), E-STOP, HORN, LED (podświetlenie), wskaźnik POWER (%), pedały REV i FWD.
 
-- **01 Stick drive** — skręt okrągłym drążkiem (liczy się tylko lewo / środek / prawo); na makiecie gałka wychylona w lewo.
+- **01 Stick drive** — skręt okrągłym drążkiem, proporcjonalny do wychylenia gałki w poziomie; na makiecie gałka wychylona w lewo.
 - **01A Stick drive — idle** — postój, moc 0 %, CRUISE wyszarzony (niedostępny przy mocy 0).
 - **02 Cruise engaged** — przycisk CRUISE podświetlony (wypełniony), wskaźnik podpisany CRUISE.
 - **03 E-STOP engaged** — E-STOP podświetlony na czerwono (bez dodatkowego napisu; zwalnia się przytrzymaniem przez ok. 1 s); wskaźnik 0 %, pedały i CRUISE nieaktywne, drążek, HORN i LED działają normalnie.
@@ -549,8 +550,11 @@ Wszystkie poniższe to stałe w kodzie — nie ma ich w ustawieniach aplikacji. 
 | rozpędzanie 0 → 100 % (pedał w kierunku jazdy) | aplikacja | ok. 4 s |
 | zwalnianie 100 → 0 % (żaden pedał) | aplikacja | ok. 6 s |
 | hamowanie 100 → 0 % (pedał przeciwny) | aplikacja | ok. 3 s |
-| próg przechyłu GYRO / powrót na prosto | aplikacja | ok. 15° / ok. 10° |
-| strefa martwa drążka STICK | aplikacja | mała, do dobrania |
+| strefa martwa GYRO (przechył dający `s` = 0) | aplikacja | ok. 3° |
+| przechył GYRO dający pełny skręt (`s` = ±100) | aplikacja | ok. 30° |
+| wygładzanie GYRO: `s = s_poprz + k × (s_cel − s_poprz)` co ramkę | aplikacja | k ok. 0,3 |
+| strefa martwa drążka STICK | aplikacja | mała, ok. 15 pt |
+| kierunkowskaz: włączenie / wyłączenie przy \|`s`\| | firmware | ≥ ok. 30 / < ok. 20 |
 | czas przytrzymania do zwolnienia E-STOP | aplikacja | ok. 1 s |
 | timeout failsafe (brak ramki `drv`) | firmware | ok. 300 ms |
 | impuls hamujący przy auto-stopie | firmware | ok. 30 % przez 0,3 s |
