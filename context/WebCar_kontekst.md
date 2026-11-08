@@ -434,11 +434,11 @@ Doświadczenia z konfiguracji:
 
 ### Stan prac aplikacji — Sprint 1 (2–15 XI)
 
-Stan na 7 XI, po scaleniu PR #1–#3 do `main`. Zadania i ich opis: plan Sprintu 1 (`context/WebCar_aplikacja_mobilna_podzial_pracy_i_plan_Sprintu_1.md`). A = Piotrek (jazda i łączność), B = Jagoda (profile, ustawienia, wygląd).
+Stan na 8 XI, po scaleniu PR #1–#4 do `main`. Zadania i ich opis: plan Sprintu 1 (`context/WebCar_aplikacja_mobilna_podzial_pracy_i_plan_Sprintu_1.md`). A = Piotrek (jazda i łączność), B = Jagoda (profile, ustawienia, wygląd).
 
 | ID | Zadanie | Kto | Stan |
 |---|---|---|---|
-| W1 | Kickoff i setup projektu | A+B | scalone do `main` (PR #1): projekt, biblioteki, `app.json`, foldery, Prettier, ESLint. Zostało: uruchomienie u Piotrka z czystego `git clone`, tablica GitHub Projects |
+| W1 | Kickoff i setup projektu | A+B | scalone do `main` (PR #1): projekt, biblioteki, `app.json`, foldery, Prettier, ESLint; uruchomienie u obojga z czystego `git clone` i tablica GitHub Projects — gotowe |
 | W2 | Protokół v1 z Wojtasem i Wojtkiem | A+B | do zrobienia (termin 4 XI minął) — sekcja 9 nadal [PROPOZYCJA] |
 | W3 | Test hotspot + ESP32 + aplikacja | A+B | czeka na firmware (12–14 XI) |
 | A1–A8 | typy i config, symulator, łączność, ping, provider, sync, prototyp jazdy, testy | A | nierozpoczęte |
