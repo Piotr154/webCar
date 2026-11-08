@@ -1,7 +1,7 @@
 # WebCar — aplikacja mobilna
 
 Aplikacja na iPhone'a do sterowania samochodem RC WebCar (React Native + Expo, tylko iOS).
-Opis działania, protokół i ekrany: `context/WebCar_kontekst.md`. Podział pracy i zadania: `context/WebCar_aplikacja_mobilna_podzial_pracy_i_plan_Sprintu_1.pdf`.
+Opis działania, protokół i ekrany: `context/WebCar_kontekst.md`. Podział pracy i zadania: `context/WebCar_aplikacja_mobilna_podzial_pracy_i_plan_Sprintu_1.md`.
 
 ## Wymagania
 
