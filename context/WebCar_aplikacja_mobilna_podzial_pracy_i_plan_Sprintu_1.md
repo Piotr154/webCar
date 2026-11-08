@@ -1,6 +1,6 @@
 # WebCar — aplikacja mobilna: podział pracy i plan Sprintu 1
 
-8 XI 2026 · @Jagoda · wersja zgodna z kontekstem v2.19 i makietami z 3 XI (lista zmian na końcu)
+Stan: 8 listopada 2026 · wersja dokumentu 1.2 · zgodna z kontekstem v2.19 i makietami z 3 XI (lista zmian na końcu)
 
 ## W skrócie
 
@@ -16,16 +16,18 @@
 
 **Założenie czasu:** Sprint 1 to ok. 35 h na osobę (ok. 17 h tygodniowo). Gdy brakuje czasu, przesuwacie zadania oznaczone „Może poczekać”.
 
-## Co jest w folderze i co z tego wynika
+## Co jest w repo i co z tego wynika
 
-Kod aplikacji jeszcze nie istnieje, firmware ma tylko blokujący program testowy, a protokół jest szkicem. Dlatego aplikację trzeba na początku pisać pod symulator auta, a nie pod prawdziwe ESP32.
+Projekt aplikacji istnieje od 7 XI (Expo SDK 58): wszystkie ekrany są zaślepkami, logiki jeszcze nie ma — aktualny stan prac jest w sekcji 8 kontekstu. Firmware ma tylko blokujący program testowy, a protokół jest szkicem. Dlatego aplikację trzeba na początku pisać pod symulator auta, a nie pod prawdziwe ESP32.
 
 | Plik | Zawartość | Znaczenie dla aplikacji |
 |---|---|---|
-| `WebCar_kontekst.md` (v2.19, 8 XI) | sprzęt, łączność (sekcja 3), zachowanie funkcji (4, 7), stack (8), protokół (9), ekrany (11), stałe (12) | główne źródło — zadania niżej odwołują się do jego sekcji |
-| `WebCar - all screens.html`, `WebCar-2.pdf` | makiety 25 stanów ekranów (01–19, w tym 05A) | kolory, czcionki, teksty, układ; przy różnicy wygrywa opis z kontekstu. Aktualny jest plik HTML — PDF makiet traktujcie jako aktualny tylko wtedy, gdy wygenerowaliście go po ostatnich zmianach |
-| `WebCar_plan_pracy.pdf` | starszy plan sprzętowy (lipiec) | nieistotny; ma starą mapę pinów — obowiązuje kontekst |
-| schemat, PCB/Gerber, kosztorys | płytka główna i koszty | nieistotne dla aplikacji |
+| `context/WebCar_kontekst.md` (v2.19, 8 XI) | sprzęt, łączność (sekcja 3), zachowanie funkcji (4, 7), stack i stan prac (8), protokół (9), ekrany (11), stałe (12) | główne źródło — zadania niżej odwołują się do jego sekcji |
+| `context/WebCar_-_all_screens.html` | makiety 25 stanów ekranów (01–19, w tym 05A) | kolory, czcionki, teksty, układ; przy różnicy wygrywa opis z kontekstu |
+| `context/WebCar_aplikacja_mobilna_podzial_pracy_i_plan_Sprintu_1.md` | ten plik: podział pracy, harmonogram, zadania Sprintu 1 | każde zadanie to jedno issue na GitHubie z tym samym ID |
+| `README.md` | uruchomienie projektu, komendy, struktura, decyzje (np. kursywa przez `skewX`) | pierwsze kroki po `git clone` |
+
+Poza repo zostają materiały zespołu nieistotne dla aplikacji: stary plan sprzętowy z lipca (`WebCar_plan_pracy.pdf`, nieaktualna mapa pinów — obowiązuje kontekst), schemat, PCB/Gerber i kosztorys.
 
 **Gdzie jest praca.** Najwięcej trudnej logiki siedzi w ekranie jazdy i w łączności; najwięcej ekranów — w profilach i ustawieniach.
 
@@ -1011,16 +1013,17 @@ Jeśli w grudniu zabraknie czasu na całą aplikację: wymagania z sekcji 10 (st
 
 ## Zmiany w tej wersji
 
-### 8 XI — skręt stopniowy, plik w Markdown
+### 1.2 (8 XI) — skręt stopniowy, plik w Markdown
 
 Dokument dostosowany do kontekstu v2.19 i przeniesiony z PDF do Markdown (`.md`), żeby dało się go zmieniać razem z kodem.
 
 - **Skręt stopniowy zamiast zero-jedynkowego:** `s` w `drv` to liczba całkowita −100…100 (było −1/0/1); kąt kół proporcjonalny do wychylenia gałki albo przechyłu telefonu. Firmware przelicza `s` liniowo na 1250…1750 µs. Kierunkowskazy z histerezą (\|s\| ≥ ok. 30 włącza, < ok. 20 wyłącza). Zmienione: demo (pkt 6), W2, W3, A1 (`DrvMsg.s: number`; `GYRO_DEADZONE_DEG`, `GYRO_MAX_DEG`, `GYRO_SMOOTHING` zamiast `GYRO_ON_DEG` / `GYRO_OFF_DEG`), A2 (obcięcie `s` do ±100), A7 (`stickToSteer()` w `src/drive/steering.ts`, nowy punkt „Gotowe, gdy”), A8 (testy skrętu), tabela firmware (22 XI, 26 XI), ryzyka (drgające serwo), struktura projektu (`src/drive/`).
 - **Statusy zadań** zgodne z tablicą na GitHubie (W1, B1, B2 — gotowe; B3 — w toku).
+- **„Co jest w repo”:** tabela opisuje pliki, które faktycznie są w repo; materiały spoza repo wymienione pod tabelą. Nagłówek ze stanem, datą i numerem wersji jak w kontekście.
 
-### 3 XI
+### 1.1 (3 XI)
 
-Dokument dostosowany do kontekstu v2.14 i aktualnych makiet. Najważniejsze zmiany względem wersji z 2 XI:
+Dokument dostosowany do kontekstu v2.14 i aktualnych makiet. Najważniejsze zmiany względem wersji 1.0 (2 XI):
 
 - **Profil startowy:** przy pierwszym starcie jest jeden profil DRIVER z wartościami domyślnymi z sekcji 7 (limit 30 %, auto-stop 30 cm, jasność 50 %, klakson 1, głośność 15, radio OFF) zamiast czterech profili z makiet. Profile z makiet dodaje przycisk w `/dev` (B9). Zmienione: demo, B4, B8, B9, A6.
 - **Ping co 0,5 s na każdym ekranie** (było 1 s). Firmware gasi taśmę po zamknięciu połączenia albo 2 s bez wiadomości — symulator to naśladuje. Zmienione: W2, A1, A2, A4.
