@@ -1,6 +1,6 @@
 # WebCar — kontekst projektu
 
-Stan: 8 listopada 2026 · wersja dokumentu 2.19
+Stan: 11 listopada 2026 · wersja dokumentu 2.20
 
 ## 0. Jak korzystać z tego dokumentu
 
@@ -35,7 +35,7 @@ Praca inżynierska na studiach informatycznych, zespół czteroosobowy (Piotrek,
 
 Cel: zdalnie sterowany model samochodu z rozbudowaną elektroniką, sterowany z aplikacji na iPhonie przez WiFi, z podglądem wideo i telemetrią.
 
-Etap: sprzęt w trakcie montażu i testów podzespołów; schemat płytki głównej gotowy; działa blokujący program testowy (sekcja 6). Projekt aplikacji założony 7 XI (Expo SDK 58): wszystkie ekrany istnieją jako zaślepki, logika jeszcze nie — stan prac w sekcji 8. Istnieją makiety ekranów (sekcja 11).
+Etap: sprzęt w trakcie montażu i testów podzespołów; schemat płytki głównej gotowy; działa blokujący program testowy (sekcja 6). Projekt aplikacji założony (Expo SDK 58): wszystkie ekrany istnieją jako zaślepki, logika jeszcze nie — stan prac w sekcji 8. Istnieją makiety ekranów (sekcja 11).
 
 ## 2. Platforma sprzętowa
 
@@ -213,7 +213,7 @@ Wyjaśnienia:
 
 **Kamera** — obraz z kamery, napis CAMERA OFF, gdy kamera jest wyłączona w Drive settings, albo CAMERA CONNECTION LOST, gdy jest włączona, ale strumień nie działa (sekcja 3).
 
-**Kierunkowskazy** — automatyczne, bez przycisków na ekranie jazdy. Gdy pojazd wyraźnie skręca (|`s`| w ramce `drv` ≥ ok. 30), firmware miga kierunkowskazem po tej stronie; gdy skręt spadnie poniżej ok. 20 (np. koła wracają na prosto), kierunkowskaz gaśnie. Dwa progi (histereza) sprawiają, że drobne korekty toru nie włączają kierunkowskazu, a przy skręcie bliskim progu nie miga on na zmianę (sekcja 12). Działa w obu trybach skrętu, także przy włączonym E-STOP, a przy failsafe gaśnie razem z powrotem kół na prosto. Przełącznik BLINKERS OFF/ON w Drive settings (zapisywany w profilu, pole `blk` w `cfg`) wyłącza tę funkcję [PROPOZYCJA: logika w firmware, bo firmware i tak zna skręt — aplikacja nie wysyła osobnych poleceń].
+**Kierunkowskazy** — automatyczne, bez przycisków na ekranie jazdy. Gdy pojazd wyraźnie skręca (|`s`| w ramce `drv` ≥ ok. 30), firmware miga kierunkowskazem po tej stronie; gdy skręt spadnie poniżej ok. 20 (np. koła wracają na prosto), kierunkowskaz gaśnie. Dwa progi (histereza) sprawiają, że drobne korekty toru nie włączają kierunkowskazu, a przy skręcie bliskim progu nie miga on na zmianę (sekcja 12). Działa w obu trybach skrętu, także przy włączonym E-STOP, a przy failsafe gaśnie razem z powrotem kół na prosto. Przełącznik BLINKERS OFF/ON w Drive settings (zapisywany w profilu, pole `blk` w `cfg`) wyłącza tę funkcję. Logika jest w firmware, bo firmware i tak zna skręt — aplikacja nie wysyła osobnych poleceń.
 
 **Reflektory i światła tylne** — bez przycisków, sterowane automatycznie przez firmware: reflektory świecą stale, światła tylne tylko podczas jazdy wstecz (moc ujemna). Pojazd nie ma świateł stop.
 
@@ -409,7 +409,7 @@ Wszystkie te biblioteki działają w Expo Go, więc do pisania i testowania wyst
 - **Dostęp do sieci lokalnej.** Od iOS 14 łączenie z urządzeniami w sieci lokalnej wymaga zgody użytkownika i opisu `NSLocalNetworkUsageDescription`. Expo Go ma go u siebie; w development buildzie trzeba go dodać w `app.json` (`ios.infoPlist`).
 - **Połączenia nieszyfrowane (`ws://`, `http://`).** W development buildzie potrzebny jest wyjątek App Transport Security: `NSAppTransportSecurity → NSAllowsLocalNetworking: true` (w `ios.infoPlist`). W Expo Go zwykle działa bez konfiguracji; problem ujawnia się dopiero w buildzie.
 
-### Projekt aplikacji (założony 7 XI 2026, zadanie W1)
+### Projekt aplikacji (zadanie W1)
 
 | Element | Wersja / ustalenie |
 |---|---|
@@ -419,7 +419,7 @@ Wszystkie te biblioteki działają w Expo Go, więc do pisania i testowania wyst
 | Ekrany | `app/` w katalogu głównym (nie `src/app/`, jak w nowym szablonie Expo) — zgodnie z planem pracy |
 | Pozostały kod | `src/` (`components`, `connection`, `drive`, `db`, `state`), import przez alias `@/`, np. `@/components/ScreenStub` |
 | Tekst | `src/components/Typography.tsx`: `Heading` (Saira Condensed, wielkie litery, pochylenie `skewX`), `Label` (JetBrains Mono 700, wielkie litery, rozstrzelenie), `Mono` (JetBrains Mono 500). `fontFamily` tylko w `Typography.tsx` i `theme.ts`. Czcionki ładuje `app/_layout.tsx`; ekran powitalny zostaje do końca ładowania |
-| Motyw | `src/theme.ts`: `colors`, `underglowColors`, `fonts`, `space`, `overlay`. W ekranach i komponentach kolory tylko przez `colors.*`, bez wartości hex. Nazwy różnią się od planu Sprintu 1: `colors.background` (w planie `bg`) i `colors.disabledBackground` (w planie `disabledBg`) |
+| Motyw | `src/theme.ts`: `colors`, `underglowColors`, `fonts`, `space`, `overlay`. W ekranach i komponentach kolory tylko przez `colors.*`, bez wartości hex. |
 | Symulator auta | `tools/mock-car/` (zadanie A2) |
 | Formatowanie | Prettier (`singleQuote`), formatowanie przy zapisie w VS Code (`.vscode/settings.json`) |
 | `app.json` | `orientation: default` (pion blokuje kod), `userInterfaceStyle: dark`, `supportsTablet: false`, wpisy z „Pułapek iOS” już dodane |
@@ -432,20 +432,20 @@ Doświadczenia z konfiguracji:
 - Expo Go potrzebuje zgody na sieć lokalną (iPhone: Ustawienia → Prywatność i ochrona → Sieć lokalna). Bez niej nie połączy się z Metro ani z ESP32.
 - Komunikat `Unable to run simctl` przy `npx expo start` dotyczy symulatora iOS z Xcode — nie używamy go, można ignorować.
 
-### Stan prac aplikacji — Sprint 1 (2–15 XI)
+### Stan prac aplikacji — Sprint 1
 
-Stan na 8 XI, po scaleniu PR #1–#4 do `main`. Zadania i ich opis: plan Sprintu 1 (`context/WebCar_aplikacja_mobilna_podzial_pracy_i_plan_Sprintu_1.md`). A = Piotrek (jazda i łączność), B = Jagoda (profile, ustawienia, wygląd).
+Zadania i ich opis: plan Sprintu 1 (`context/plan_sprintu_1.md`). A = Piotrek (jazda i łączność), B = Jagoda (profile, ustawienia, wygląd).
 
 | ID | Zadanie | Kto | Stan |
 |---|---|---|---|
 | W1 | Kickoff i setup projektu | A+B | scalone do `main` (PR #1): projekt, biblioteki, `app.json`, foldery, Prettier, ESLint; uruchomienie u obojga z czystego `git clone` i tablica GitHub Projects — gotowe |
-| W2 | Protokół v1 z Wojtasem i Wojtkiem | A+B | do zrobienia (termin 4 XI minął) — sekcja 9 nadal [PROPOZYCJA] |
-| W3 | Test hotspot + ESP32 + aplikacja | A+B | czeka na firmware (12–14 XI) |
+| W2 | Protokół v1 z Wojtasem i Wojtkiem | A+B | gotowe — protokół v1.0 zamrożony, potwierdzony przez Wojtasa i Wojtka (sekcja 9) |
+| W3 | Test hotspot + ESP32 + aplikacja | A+B | czeka na firmware |
 | A1–A8 | typy i config, symulator, łączność, ping, provider, sync, prototyp jazdy, testy | A | nierozpoczęte |
 | B1 | Czcionki i test kursywy | B | scalone do `main` (PR #3): ładowanie czcionek, test na iPhonie (kursywa przez `skewX`), `Typography.tsx`; ekran `/dev` pokazuje `Heading`, `Label` i `Mono` |
 | B2 | Motyw `theme.ts` | B | scalone do `main` (PR #2): `src/theme.ts`, ekrany i `ScreenStub` używają `colors.*` i `space.*` |
 | B3 | Nawigacja i ekrany-zaślepki | B | częściowo: `_layout.tsx` ze `Stack`, `GestureHandlerRootView` i `StatusBar`; zaślepki wszystkich ekranów (`ScreenStub`, tymczasowa lista ekranów na Home). Zostało: opcje tras (`menu` jako `transparentModal` + `fade`, `drive` z `gestureEnabled: false`), blokada pionu w `_layout`, płytki stos przy przejściach z menu |
-| B4 | SQLite i repozytorium profili | B | do zrobienia (potrzebne Piotrkowi do A6 ok. 11 XI) |
+| B4 | SQLite i repozytorium profili | B | do zrobienia (potrzebne Piotrkowi do A6) |
 | B5 | `ProfileProvider` i `useProfiles` | B | do zrobienia |
 | B6 | Komponenty bazowe | B | do zrobienia |
 | B7 | Ekran Menu (09) | B | do zrobienia |
@@ -454,7 +454,9 @@ Stan na 8 XI, po scaleniu PR #1–#4 do `main`. Zadania i ich opis: plan Sprintu
 
 ## 9. Protokół
 
-Format: JSON, krótkie klucze, liczby całkowite. Cały protokół jest szkicem roboczym [PROPOZYCJA] — do uzgodnienia między osobą piszącą aplikację a osobą piszącą firmware.
+**Protokół v1.0 — zamrożony 11 XI 2026** (uzgodniony z Wojtasem i Wojtkiem, zadanie W2).
+
+Format: JSON, krótkie klucze, liczby całkowite.
 
 Adresy: główny ESP32 — WebSocket `ws://172.20.10.13/ws` (port 80), Xiao `172.20.10.14` (strumień `http://172.20.10.14:81/stream`).
 
@@ -469,17 +471,19 @@ Konwencje: moc dodatnia = do przodu, ujemna = do tyłu; skręt `-100` = pełny w
 | `{"t":"act","a":"led","on":1}` | podświetlenie wł. (`1`) / wył. (`0`) — przycisk LED, podgląd na ekranie Light & sound, koniec sesji, synchronizacja |
 | `{"t":"act","a":"estop","on":1}` | włącza E-STOP (zatrzask w firmware); `"on":0` zwalnia. Dopóki jest włączony, firmware ignoruje moc z `drv` |
 | `{"t":"act","a":"radio","n":2}` | odtwarzaj utwór nr 2; `"n":0` zatrzymuje |
-| `{"t":"cfg","limit":45,"stop":20,"blk":1,"led":"#639922","bri":60,"vol":22,"horn":3}` | ustawienia aktywnego profilu, zapisywane w NVS; można wysłać tylko zmienione pola. `limit` %, `stop` cm (próg auto-stopu), `blk` = 1 gdy kierunkowskazy automatyczne włączone, `led` kolor, `bri` %, `vol` 0–30, `horn` 1–6 |
+| `{"t":"cfg","limit":45,"stop":20,"blk":1,"led":"#639922","bri":60,"vol":22,"horn":3}` | ustawienia aktywnego profilu, zapisywane w NVS; można wysłać tylko część pól — firmware zmienia tylko przysłane pola (po połączeniu aplikacja i tak wysyła wszystkie, sekcja 7). `limit` %, `stop` cm (próg auto-stopu), `blk` = 1 gdy kierunkowskazy automatyczne włączone, `led` kolor jako tekst `"#RRGGBB"`, jeden z 7: `#639922`, `#2FC6DE`, `#F0B429`, `#FF4438`, `#C0308A`, `#7A3CE8`, `#F2F3F4`, `bri` %, `vol` 0–30, `horn` 1–6 |
 | `{"t":"ping","id":17}` | pomiar opóźnienia, co ok. 0,5 s na każdym ekranie, gdy jest połączenie (na ekranach postoju to jedyna wiadomość od aplikacji, a przy limicie 2 s jeden spóźniony ping nie zgasi taśmy); firmware traktuje go też jako znak, że aplikacja jest połączona (gaszenie podświetlenia, sekcja 6) |
 
 Tryb skrętu (STICK/GYRO) i model pedałów działają wyłącznie w aplikacji — pojazd dostaje tylko wynik w ramce `drv`.
+
+Drugi klient WebSocket (np. po wznowieniu połączenia): nowe połączenie zastępuje stare.
 
 ### Pojazd → aplikacja
 
 | Wiadomość | Znaczenie |
 |---|---|
-| `{"t":"hello","fw":"0.4"}` | zaraz po połączeniu: wersja firmware (aplikacja może ją pokazać w logach / przy diagnostyce) |
-| `{"t":"tel","d1":84,"d2":-1,"rssi":-54,"temp":47,"es":0,"as":0,"r":2}` | telemetria, 5–10 Hz. `d1` przód (czujnik #1), `d2` tył (czujnik #2): liczba = cm, `-1` = nic w zasięgu, `null` = błąd czujnika. `rssi` dBm, `temp` °C chipu, `es` = 1 gdy E-STOP aktywny, `as` = 1 od zatrzymania przez auto-stop do otrzymania `drv` z `g` = 0 (czyli dopóki działa blokada gazu do przodu, sekcja 4), `r` = numer odtwarzanego utworu radia (1–5), `0` = radio nie gra. `r` dotyczy tylko radia (folder `/02/`) — klakson go nie zmienia |
+| `{"t":"hello","fw":"1.0"}` | zaraz po połączeniu: wersja firmware (aplikacja może ją pokazać w logach / przy diagnostyce) |
+| `{"t":"tel","d1":84,"d2":-1,"rssi":-54,"temp":47,"es":0,"as":0,"r":2}` | telemetria, 10 Hz. `d1` przód (czujnik #1), `d2` tył (czujnik #2): liczba = cm, `-1` = nic w zasięgu, `null` = błąd czujnika (firmware wysyła `null`). `rssi` dBm, `temp` °C chipu, `es` = 1 gdy E-STOP aktywny, `as` = 1 od zatrzymania przez auto-stop do otrzymania `drv` z `g` = 0 (czyli dopóki działa blokada gazu do przodu, sekcja 4), `r` = numer odtwarzanego utworu radia (1–5), `0` = radio nie gra. `r` dotyczy tylko radia (folder `/02/`) — klakson go nie zmienia |
 | `{"t":"pong","id":17}` | odpowiedź na ping |
 
 ## 10. Funkcje wymagane zakresem pracy
@@ -503,7 +507,7 @@ Makiety to jeden statyczny plik HTML ze wszystkimi ekranami. Każdy stan ekranu 
 
 - **Wymiary trzeba przeskalować, a nie kopiować w punktach.** Ekran poziomy w makiecie ma 812×440, a iPhone 12–14 w poziomie ma 844×390 punktów (iPhone 15 ok. 852×393) — makieta jest o ok. 50 punktów wyższa niż prawdziwy ekran, więc po skopiowaniu wymiarów drążek i pedały wyszłyby poza ekran. Ekran pionowy w makiecie ma 372×844, iPhone 12–14 ma 390×844. Układ dopasowujemy do rzeczywistego rozmiaru ekranu, zachowując rozmieszczenie i proporcje elementów.
 - **Obszar bezpieczny (safe area).** Makiety nie uwzględniają wycięcia ekranu (notch / Dynamic Island) ani paska stanu. W poziomie wycięcie zasłania kilkadziesiąt punktów z boku, w pionie górne elementy (np. „HELLO KAROL”) trafiłyby pod pasek stanu. Aplikacja używa `react-native-safe-area-context` (`SafeAreaView` / `useSafeAreaInsets`).
-- **Czcionki:** Saira Condensed (700, kursywa) — nagłówki, wartości i przyciski; JetBrains Mono (500/700, wielkie litery) — etykiety i dane. Obie z Google Fonts (licencja OFL), dołączone do aplikacji. Saira Condensed nie ma wersji kursywnej — przeglądarka tylko pochyla zwykłą. Sprawdzone na iPhonie 7 XI: iOS w React Native jej nie pochyla (`fontStyle: 'italic'` nic nie zmienia), więc nagłówki pochyla `transform: [{ skewX: '-10deg' }]` w komponencie `Heading` (`src/components/Typography.tsx`).
+- **Czcionki:** Saira Condensed (700, kursywa) — nagłówki, wartości i przyciski; JetBrains Mono (500/700, wielkie litery) — etykiety i dane. Obie z Google Fonts (licencja OFL), dołączone do aplikacji. Saira Condensed nie ma wersji kursywnej — przeglądarka tylko pochyla zwykłą. Sprawdzone na iPhonie: iOS w React Native jej nie pochyla (`fontStyle: 'italic'` nic nie zmienia), więc nagłówki pochyla `transform: [{ skewX: '-10deg' }]` w komponencie `Heading` (`src/components/Typography.tsx`).
 - **Zaślepki:** pasiasty prostokąt „camera frame” to miejsce na strumień MJPEG z kamery (sekcja 8), a rysunek auta na ekranie głównym zostanie zastąpiony właściwym obrazkiem.
 
 ### Jazda — orientacja pozioma

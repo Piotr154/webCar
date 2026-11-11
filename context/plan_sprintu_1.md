@@ -1,6 +1,6 @@
 # WebCar — aplikacja mobilna: podział pracy i plan Sprintu 1
 
-Stan: 8 listopada 2026 · wersja dokumentu 1.2 · zgodna z kontekstem v2.19 i makietami z 3 XI (lista zmian na końcu)
+Stan: 11 listopada 2026 · wersja dokumentu 1.3 · zgodna z kontekstem v2.20 i makietami z 3 XI (lista zmian na końcu)
 
 ## W skrócie
 
@@ -10,21 +10,21 @@ Stan: 8 listopada 2026 · wersja dokumentu 1.2 · zgodna z kontekstem v2.19 i ma
 - **B — Profile i ustawienia (propozycja: Jagoda):** wygląd (motyw, czcionki, komponenty), nawigacja, baza SQLite, ekrany 08–19.
 - Przypisanie osób to tylko propozycja. Jeśli wolicie odwrotnie, zamieńcie litery — zadania się nie zmieniają.
 
-**Plan:** 3 sprinty po 2 tygodnie (2 XI – 13 XII) i 3 dni buforu — aplikacja gotowa 16 XII.
+**Plan:** 3 sprinty po 2 tygodnie i 3 dni buforu.
 
-**Cel Sprintu 1 (2–15 XI):** na iPhonie działa szkielet aplikacji. Wszystkie ekrany są w nawigacji, Home pokazuje prawdziwy stan połączenia z symulatorem auta i aktywny profil z bazy, a prototyp ekranu jazdy wysyła 20 ramek `drv` na sekundę przy sterowaniu dwoma palcami.
+**Cel Sprintu 1:** na iPhonie działa szkielet aplikacji. Wszystkie ekrany są w nawigacji, Home pokazuje prawdziwy stan połączenia z symulatorem auta i aktywny profil z bazy, a prototyp ekranu jazdy wysyła 20 ramek `drv` na sekundę przy sterowaniu dwoma palcami.
 
-**Założenie czasu:** Sprint 1 to ok. 35 h na osobę (ok. 17 h tygodniowo). Gdy brakuje czasu, przesuwacie zadania oznaczone „Może poczekać”.
+**Gdy brakuje czasu,** przesuwacie zadania oznaczone „Może poczekać”.
 
 ## Co jest w repo i co z tego wynika
 
-Projekt aplikacji istnieje od 7 XI (Expo SDK 58): wszystkie ekrany są zaślepkami, logiki jeszcze nie ma — aktualny stan prac jest w sekcji 8 kontekstu. Firmware ma tylko blokujący program testowy, a protokół jest szkicem. Dlatego aplikację trzeba na początku pisać pod symulator auta, a nie pod prawdziwe ESP32.
+Projekt aplikacji istnieje (Expo SDK 58): wszystkie ekrany są zaślepkami, logiki jeszcze nie ma — aktualny stan prac jest w sekcji 8 kontekstu. Firmware ma tylko blokujący program testowy, a protokół v1.0 jest zamrożony (sekcja 9 kontekstu), ale firmware go jeszcze nie obsługuje. Dlatego aplikację trzeba na początku pisać pod symulator auta, a nie pod prawdziwe ESP32.
 
 | Plik | Zawartość | Znaczenie dla aplikacji |
 |---|---|---|
-| `context/WebCar_kontekst.md` (v2.19, 8 XI) | sprzęt, łączność (sekcja 3), zachowanie funkcji (4, 7), stack i stan prac (8), protokół (9), ekrany (11), stałe (12) | główne źródło — zadania niżej odwołują się do jego sekcji |
+| `context/WebCar_kontekst.md` (v2.20, 11 XI) | sprzęt, łączność (sekcja 3), zachowanie funkcji (4, 7), stack i stan prac (8), protokół (9), ekrany (11), stałe (12) | główne źródło — zadania niżej odwołują się do jego sekcji |
 | `context/WebCar_-_all_screens.html` | makiety 25 stanów ekranów (01–19, w tym 05A) | kolory, czcionki, teksty, układ; przy różnicy wygrywa opis z kontekstu |
-| `context/WebCar_aplikacja_mobilna_podzial_pracy_i_plan_Sprintu_1.md` | ten plik: podział pracy, harmonogram, zadania Sprintu 1 | każde zadanie to jedno issue na GitHubie z tym samym ID |
+| `context/plan_sprintu_1.md` | ten plik: podział pracy, harmonogram, zadania Sprintu 1 | każde zadanie to jedno issue na GitHubie z tym samym ID |
 | `README.md` | uruchomienie projektu, komendy, struktura, decyzje (np. kursywa przez `skewX`) | pierwsze kroki po `git clone` |
 
 Poza repo zostają materiały zespołu nieistotne dla aplikacji: stary plan sprzętowy z lipca (`WebCar_plan_pracy.pdf`, nieaktualna mapa pinów — obowiązuje kontekst), schemat, PCB/Gerber i kosztorys.
@@ -54,14 +54,13 @@ W tej aplikacji nie ma serwera. „Backend” to warstwa logiki w telefonie: Web
 | Spójność wyglądu | dobra | słaba: dwa style, zdublowane komponenty | dobra — komponenty ma jedna osoba (B) |
 | Obciążenie | nierówne: 25 stanów UI kontra cienka logika | równe | zbliżone: A ma mniej ekranów i trudniejszą logikę, B więcej prostszych ekranów |
 | Ryzyko integracji | wysokie — wszystko łączy się pod koniec | średnie | niskie — każda funkcja działa od razu od ekranu do auta |
-| Wiedza na obronę | każdy zna połowę każdego ekranu | oboje znacie wszystko, ale wolniej idzie | każdy zna swój moduł w całości, cudzy — z code review |
+| Wiedza na obronę | każdy zna połowę każdego ekranu | oboje znacie wszystko, ale wolniej idzie | każdy zna swój moduł w całości, ale orientuje się też w kodzie drugiej osoby |
 
 **Jak to działa w praktyce:**
 
 1. Sprint 1 to fundamenty. A buduje łączność i symulator auta, B — wygląd, nawigację i bazę. Te fundamenty są od siebie niezależne, więc nikt na nikogo nie czeka.
 2. Od Sprintu 2 każdy robi ekrany swojego modułu w całości (wygląd + logika). Fundamentów drugiej osoby używa przez ustalone funkcje (kontrakt w sekcji Sprintu 1).
-3. Każdy pull request przegląda druga osoba — tak oboje znacie całą aplikację przed obroną.
-4. Zawór bezpieczeństwa: jeśli po Sprincie 2 ktoś jest w tyle, ekran Telemetry (15–17) przechodzi do drugiej osoby.
+3. Zawór bezpieczeństwa: jeśli po Sprincie 2 ktoś jest w tyle, ekran Telemetry (15–17) przechodzi do drugiej osoby.
 
 ### Każdy moduł ma jednego właściciela i styka się z drugim w 4 miejscach
 
@@ -79,25 +78,24 @@ Tylko A rozmawia z autem. B korzysta z łączności przez `useConnection()`, `se
 
 ## Harmonogram: 6 tygodni
 
-Aplikacja gotowa 16 grudnia: 3 sprinty po 2 tygodnie i 3 dni buforu.
+3 sprinty po 2 tygodnie i 3 dni buforu.
 
-| | Sprint 1 (2–15 XI) | Sprint 2 (16–29 XI) | Sprint 3 (30 XI – 13 XII) | Bufor (14–16 XII) |
+| | Sprint 1 | Sprint 2 | Sprint 3 | Bufor |
 |---|---|---|---|---|
-| **A** (Piotrek) | Łączność + symulator; wskaźnik łącza, sync cfg i LED; prototyp jazdy 20 Hz | Ekran jazdy STICK; CRUISE, E-STOP, pedały; CONNECTION LOST, menu | GYRO (04), kamera (05, 05A); sesje i statystyki; tempomat z auto-stopem | Tylko poprawki. **16 XII: gotowe** |
+| **A** (Piotrek) | Łączność + symulator; wskaźnik łącza, sync cfg i LED; prototyp jazdy 20 Hz | Ekran jazdy STICK; CRUISE, E-STOP, pedały; CONNECTION LOST, menu | GYRO (04), kamera (05, 05A); sesje i statystyki; tempomat z auto-stopem | Tylko poprawki. **Aplikacja gotowa** |
 | **B** (Jagoda) | Motyw, czcionki, menu; SQLite + profil DRIVER; Home (08, 08A) | Profile (10–11B); Drive settings (13); Light & sound, Radio | Telemetry (15–17); safe area, dopracowanie; zrzuty ekranów do pracy | |
-| **Razem** (+ Wojtas i Wojtek) | Protokół v1 do 4 XI; test hotspot + ESP32; demo 15 XI | Jazda z apki: 29 XI (koła w powietrzu); demo 29 XI | Testy na aucie, poprawki; koniec funkcji: 13 XII; nagranie demo | |
+| **Razem** (+ Wojtas i Wojtek) | Protokół v1; test hotspot + ESP32; demo | Jazda z apki (koła w powietrzu); demo | Testy na aucie, poprawki; koniec funkcji; nagranie demo | |
 
 Kolejność jest celowa: najbardziej ryzykowne rzeczy (łączność, multi-touch, jazda) idą najwcześniej, a ekrany formularzowe później. Sprint 1 jest rozpisany niżej; Sprinty 2 i 3 rozpiszecie na planowaniu (W4).
 
 ## Zasady pracy
 
-Gałąź `main` zawsze działa na iPhonie i nic do niej nie trafia bez przeglądu drugiej osoby.
+Gałąź `main` zawsze działa na iPhonie.
 
-- **Repo:** prywatne repo `webcar-app` na GitHubie. Praca na gałęziach `a/A3-connection`, `b/B4-sqlite` (osoba + ID zadania). Pull request → review drugiej osoby w ciągu 24 h → merge.
-- **Tablica:** GitHub Projects z kolumnami Do zrobienia / W toku / Review / Gotowe. Każde zadanie z tego dokumentu to jedno issue z tym samym ID.
-- **Spotkania:** poniedziałek i czwartek po 15 min (zrobione / następne / blokady). Raz w tygodniu 30 min z Wojtasem i Wojtkiem (protokół, testy na aucie). Na koniec sprintu demo na iPhonie i planowanie (ok. 1,5 h).
+- **Repo:** `Piotr154/webCar` na GitHubie. Praca na gałęziach `a/A3-connection`, `b/B4-sqlite` (osoba + ID zadania). Pull request → merge.
+- **Tablica:** GitHub Projects z kolumnami Do zrobienia / W toku / Gotowe. Każde zadanie z tego dokumentu to jedno issue z tym samym ID.
 - **Kod:** TypeScript bez przesady — wystarczą typy protokołu i profilu. Nazwy w kodzie po angielsku, formatowanie Prettier. Wszystkie stałe aplikacji z sekcji 12 kontekstu w jednym pliku `src/config.ts`.
-- **Kontrakt:** pliki `src/connection/protocol.ts`, `src/connection/connection.ts`, `src/connection/sync.ts`, `src/db/profiles.ts` i oba konteksty zmienia tylko właściciel, a zmianę zatwierdza druga osoba.
+- **Kontrakt:** pliki `src/connection/protocol.ts`, `src/connection/connection.ts`, `src/connection/sync.ts`, `src/db/profiles.ts` i oba konteksty zmienia tylko właściciel.
 - **Zmiana protokołu:** aktualizacja sekcji 9 kontekstu, podbicie wersji `fw` i wiadomość do Wojtasa i Wojtka.
 
 **Definition of Done — każde zadanie:**
@@ -106,13 +104,13 @@ Gałąź `main` zawsze działa na iPhonie i nic do niej nie trafia bez przegląd
 - [ ] w konsoli Metro nie ma czerwonych błędów ani żółtych ostrzeżeń z waszego kodu;
 - [ ] spełnia wszystkie punkty „Gotowe, gdy” z opisu zadania;
 - [ ] ekran porównany z makietą (zrzut ekranu w PR);
-- [ ] PR przejrzany i zmergowany do `main`.
+- [ ] PR zmergowany do `main`.
 
-## Sprint 1 (2–15 XI): fundamenty
+## Sprint 1: fundamenty
 
 **Cel:** szkielet aplikacji na iPhonie połączony z symulatorem auta. To zamyka największe ryzyka techniczne (łączność, multi-touch, czcionki) przed budową pełnego ekranu jazdy.
 
-**Demo 15 XI — scenariusz do odegrania na iPhonie:**
+**Demo — scenariusz do odegrania na iPhonie:**
 
 1. Pierwszy start aplikacji (pusta baza) → Home: HELLO DRIVER, kafelki DRIVER, STICK, 30 % (profil startowy z sekcji 7).
 2. Symulator wyłączony → CONNECTION: OFFLINE, przycisk DRIVE nieaktywny.
@@ -125,7 +123,7 @@ Gałąź `main` zawsze działa na iPhonie i nic do niej nie trafia bez przegląd
 **Struktura projektu i właściciele:**
 
 ```
-webcar-app/
+webCar/
 ├─ app/                     ekrany (expo-router)
 │  ├─ _layout.tsx           czcionki, providery, Stack         B (+A: ConnectionProvider, start)
 │  ├─ index.tsx             08 Home                            B
@@ -180,41 +178,41 @@ useProfiles(): { profiles: Profile[]; activeProfile: Profile | null;
                  activate; create; rename; remove; update }
 ```
 
-**Zadania Sprintu 1** — suma: A ok. 34 h (+2 h opcjonalnie), B ok. 35 h (+1,5 h). Szczegóły każdego zadania w kolejnych sekcjach.
+**Zadania Sprintu 1** — szczegóły każdego zadania w kolejnych sekcjach.
 
-| ID | Zadanie | Kto | Czas | Kiedy | Zależy od | Priorytet | Status |
-|---|---|---|---|---|---|---|---|
-| W1 | Kickoff i setup projektu (razem) | A+B | 3 h | 2–3 XI | — | Musi | Gotowe |
-| W2 | Protokół v1 uzgodniony z Wojtasem i Wojtkiem | A+B | 1,5 h | do 4 XI | — | Musi | Do zrobienia |
-| A1 | Typy protokołu i `config.ts` | A | 2 h | 4 XI | W1, W2 | Musi | Do zrobienia |
-| A2 | Symulator auta | A | 4 h | 5 XI | A1 | Musi | Do zrobienia |
-| A3 | Moduł łączności | A | 6 h | 6–8 XI | A1, A2 | Musi | Do zrobienia |
-| A4 | Ping i wskaźnik jakości łącza | A | 3 h | 9 XI | A3 | Musi | Do zrobienia |
-| A5 | `ConnectionProvider` i `useConnection` | A | 2 h | 10 XI | A3, A4 | Musi | Do zrobienia |
-| A6 | Synchronizacja po połączeniu (profil, radio, LED) | A | 2 h | 11 XI | A3, B4 | Musi | Do zrobienia |
-| A7 | Prototyp ekranu jazdy (multi-touch, 20 Hz, skręt stopniowy) | A | 7 h | 11–14 XI | A3, B3 | Musi | Do zrobienia |
-| A8 | Testy jednostkowe (Jest) | A | 2 h | 14 XI | A4, A7 | Może poczekać | Do zrobienia |
-| B1 | Czcionki i test kursywy | B | 3 h | 3–4 XI | W1 | Musi | Gotowe |
-| B2 | Motyw z makiet (`theme.ts`) | B | 2 h | 4 XI | W1 | Musi | Gotowe |
-| B3 | Nawigacja i ekrany-zaślepki | B | 3 h | 5 XI | W1 | Musi | W toku |
-| B4 | Baza SQLite i repozytorium profili | B | 5 h | 6–8 XI | W1 | Musi | Do zrobienia |
-| B5 | `ProfileProvider` i `useProfiles` | B | 2 h | 9 XI | B4 | Musi | Do zrobienia |
-| B6 | Komponenty bazowe | B | 7 h | 9–11 XI | B1, B2 | Musi | Do zrobienia |
-| B7 | Ekran Menu (09) | B | 2 h | 12 XI | B3, B6 | Musi | Do zrobienia |
-| B8 | Ekran Home (08, 08A) | B | 3 h | 12–13 XI | B5, B6, A5 | Musi | Do zrobienia |
-| B9 | Ekran `/dev` — katalog komponentów | B | 1,5 h | 14 XI | B6 | Może poczekać | Do zrobienia |
-| W3 | Test na sprzęcie: hotspot + ESP32 + aplikacja | A+B | 2 h | 12–14 XI | A3, firmware | Musi | Do zrobienia |
-| W4 | Demo, retro, plan Sprintu 2 | A+B | 1,5 h | 15 XI | wszystkie | Musi | Do zrobienia |
+| ID | Zadanie | Kto | Zależy od | Priorytet | Status |
+|---|---|---|---|---|---|
+| W1 | Kickoff i setup projektu (razem) | A+B | — | Musi | Gotowe |
+| W2 | Protokół v1 uzgodniony z Wojtasem i Wojtkiem | A+B | — | Musi | Gotowe |
+| A1 | Typy protokołu i `config.ts` | A | W1, W2 | Musi | Do zrobienia |
+| A2 | Symulator auta | A | A1 | Musi | Do zrobienia |
+| A3 | Moduł łączności | A | A1, A2 | Musi | Do zrobienia |
+| A4 | Ping i wskaźnik jakości łącza | A | A3 | Musi | Do zrobienia |
+| A5 | `ConnectionProvider` i `useConnection` | A | A3, A4 | Musi | Do zrobienia |
+| A6 | Synchronizacja po połączeniu (profil, radio, LED) | A | A3, B4 | Musi | Do zrobienia |
+| A7 | Prototyp ekranu jazdy (multi-touch, 20 Hz, skręt stopniowy) | A | A3, B3 | Musi | Do zrobienia |
+| A8 | Testy jednostkowe (Jest) | A | A4, A7 | Może poczekać | Do zrobienia |
+| B1 | Czcionki i test kursywy | B | W1 | Musi | Gotowe |
+| B2 | Motyw z makiet (`theme.ts`) | B | W1 | Musi | Gotowe |
+| B3 | Nawigacja i ekrany-zaślepki | B | W1 | Musi | W toku |
+| B4 | Baza SQLite i repozytorium profili | B | W1 | Musi | Do zrobienia |
+| B5 | `ProfileProvider` i `useProfiles` | B | B4 | Musi | Do zrobienia |
+| B6 | Komponenty bazowe | B | B1, B2 | Musi | Do zrobienia |
+| B7 | Ekran Menu (09) | B | B3, B6 | Musi | Do zrobienia |
+| B8 | Ekran Home (08, 08A) | B | B5, B6, A5 | Musi | Do zrobienia |
+| B9 | Ekran `/dev` — katalog komponentów | B | B6 | Może poczekać | Do zrobienia |
+| W3 | Test na sprzęcie: hotspot + ESP32 + aplikacja | A+B | A3, firmware | Musi | Do zrobienia |
+| W4 | Demo, retro, plan Sprintu 2 | A+B | wszystkie | Musi | Do zrobienia |
 
 ## Sprint 1 — zadania wspólne
 
 ### W1 — Kickoff i setup projektu (razem)
 
-**A + B · 3 h · 2–3 XI · przy jednym laptopie (pair programming)**
+**A + B · przy jednym laptopie (pair programming)**
 
 **Po co:** jeden wspólny, działający projekt, zanim każde zacznie swoją część. Inaczej powstaną dwa różne setupy.
 
-1. A zakłada prywatne repo `webcar-app` na GitHubie i dodaje B jako współpracownika.
+1. A zakłada repo `Piotr154/webCar` na GitHubie i dodaje B jako współpracownika.
 2. Tworzycie projekt z domyślnego szablonu (TypeScript + expo-router) i czyścicie przykładowe ekrany. Jeśli skryptu `reset-project` nie ma w szablonie, usuńcie przykłady ręcznie.
 
    ```bash
@@ -257,7 +255,7 @@ useProfiles(): { profiles: Profile[]; activeProfile: Profile | null;
 
 ### W2 — Protokół v1 uzgodniony z Wojtasem i Wojtkiem
 
-**A (prowadzi) + B + Wojtas i Wojtek · 1,5 h · do śr. 4 XI**
+**A (prowadzi) + B + Wojtas i Wojtek**
 
 **Po co:** sekcja 9 jest oznaczona [PROPOZYCJA]. Bez zamrożonego protokołu symulator i firmware się rozjadą, a błąd wyjdzie dopiero na aucie.
 
@@ -271,17 +269,15 @@ useProfiles(): { profiles: Profile[]; activeProfile: Profile | null;
    - drugi klient WebSocket (np. po wznowieniu połączenia) — propozycja: nowe połączenie zastępuje stare;
    - `act horn` zawsze bez numeru — gra dźwięk z `cfg.horn`, także przy TEST HORN (wybór dźwięku zapisuje się i wysyła od razu, sekcja 9);
    - **skręt stopniowy:** `s` w `drv` to liczba całkowita −100…100; firmware przelicza ją liniowo na 1250…1750 µs (`1500 + s × 2,5`) i obcina wartości spoza zakresu; kierunkowskaz włącza się przy \|s\| ≥ ok. 30 i gaśnie poniżej ok. 20 (sekcje 4, 9 i 12).
-2. Zapiszcie decyzje w sekcji 9 pliku kontekstu, usuńcie [PROPOZYCJA] i dopiszcie „Protokół v1.0 — zamrożony 4 XI 2026”.
-3. Ustalcie z Wojtasem i Wojtkiem termin testu W3 (cel: 12–14 XI) i to, co firmware musi wtedy umieć (sekcja o firmware niżej).
+2. Zapiszcie decyzje w sekcji 9 pliku kontekstu, usuńcie [PROPOZYCJA] i dopiszcie „Protokół v1.0 — zamrożony”.
 
 **Gotowe, gdy:**
 
 - [ ] sekcja 9 jest zaktualizowana, a Wojtas i Wojtek potwierdzili ją na czacie (w tym skręt −100…100)
-- [ ] termin testu W3 jest w kalendarzu
 
 ### W3 — Pierwszy test na sprzęcie: hotspot iPhone'a + ESP32 + aplikacja
 
-**A + B + Wojtas albo Wojtek · 2 h · 12–14 XI, gdy firmware ma serwer WebSocket**
+**A + B + Wojtas albo Wojtek · gdy firmware ma serwer WebSocket**
 
 **Po co:** to pierwszy punkt z listy „Do sprawdzenia na sprzęcie” (sekcja 12). Potwierdza adresy `172.20.10.x` i daje pierwsze prawdziwe RSSI i ping.
 
@@ -303,7 +299,7 @@ useProfiles(): { profiles: Profile[]; activeProfile: Profile | null;
 
 ### W4 — Demo, retro, plan Sprintu 2
 
-**A + B · 1,5 h · nd. 15 XI**
+**A + B · koniec Sprintu 1**
 
 1. Odegrajcie scenariusz demo z sekcji Sprint 1, punkt po punkcie. Co nie działa, przechodzi do Sprintu 2.
 2. Retro, po 3 minuty na osobę: co pomogło, co przeszkadzało, co zmieniamy.
@@ -311,13 +307,13 @@ useProfiles(): { profiles: Profile[]; activeProfile: Profile | null;
 
 **Gotowe, gdy:**
 
-- [ ] zadania Sprintu 2 są na tablicy z właścicielami i szacunkami czasu
+- [ ] zadania Sprintu 2 są na tablicy z właścicielami
 
 ## Sprint 1 — zadania Osoby A (jazda i łączność)
 
 ### A1 — Typy protokołu i config.ts
 
-**A · 2 h · 4 XI · zależy od: W1, W2**
+**A · zależy od: W1, W2**
 
 **Po co:** jedno miejsce z każdą wiadomością protokołu i każdą stałą aplikacji z sekcji 12. Literówka w nazwie pola wyjdzie przy kompilacji, a nie na aucie.
 
@@ -380,7 +376,7 @@ useProfiles(): { profiles: Profile[]; activeProfile: Profile | null;
 
 ### A2 — Symulator auta
 
-**A · 4 h · 5 XI · zależy od: A1**
+**A · zależy od: A1**
 
 **Po co:** firmware ma dziś tylko program testowy. Symulator mówi tym samym protokołem co ESP32, więc całą aplikację da się zbudować i przetestować bez auta, włącznie z utratą połączenia. Przyda się też Wojtasowi i Wojtkowi jako wzorzec.
 
@@ -470,7 +466,7 @@ useProfiles(): { profiles: Profile[]; activeProfile: Profile | null;
 
 ### A3 — Moduł łączności
 
-**A · 6 h · 6–8 XI · zależy od: A1, A2**
+**A · zależy od: A1, A2**
 
 **Po co:** jedno miejsce, które utrzymuje połączenie z autem (sekcja 3: `send`, `onTelemetry`, `onStatusChange`). Reszta aplikacji nie zna szczegółów WebSocketa.
 
@@ -496,7 +492,7 @@ useProfiles(): { profiles: Profile[]; activeProfile: Profile | null;
 
 ### A4 — Ping i wskaźnik jakości łącza
 
-**A · 3 h · 9 XI · zależy od: A3**
+**A · zależy od: A3**
 
 **Po co:** cztery kreski na Home i na ekranie jazdy (sekcja 3) oraz ping w ms. Ping jest też dla firmware znakiem, że aplikacja jest połączona (gaszenie taśmy, sekcja 6).
 
@@ -540,7 +536,7 @@ useProfiles(): { profiles: Profile[]; activeProfile: Profile | null;
 
 ### A5 — ConnectionProvider i useConnection
 
-**A · 2 h · 10 XI · zależy od: A3, A4**
+**A · zależy od: A3, A4**
 
 **Po co:** ekrany B dostają stan połączenia jednym hookiem, bez przerysowywania ekranu przy każdej ramce telemetrii (10 razy na sekundę).
 
@@ -557,7 +553,7 @@ useProfiles(): { profiles: Profile[]; activeProfile: Profile | null;
 
 ### A6 — Synchronizacja po połączeniu: profil, radio, podświetlenie
 
-**A · 2 h · 11 XI · zależy od: A3, B4**
+**A · zależy od: A3, B4**
 
 **Po co:** sekcja 7 — po każdym połączeniu auto dostaje ustawienia aktywnego profilu i właściwy stan podświetlenia. Źródłem prawdy jest zawsze profil w telefonie.
 
@@ -576,7 +572,7 @@ useProfiles(): { profiles: Profile[]; activeProfile: Profile | null;
 
 ### A7 — Prototyp ekranu jazdy: multi-touch, 20 Hz, skręt stopniowy, orientacja
 
-**A · 7 h · 11–14 XI · zależy od: A3, B3**
+**A · zależy od: A3, B3**
 
 **Po co:** sprawdzić teraz najbardziej ryzykowne rzeczy w całej aplikacji — dwa palce naraz, stabilne 20 Hz, płynny skręt proporcjonalny do wychylenia gałki i blokadę orientacji. W Sprincie 2 tylko dobudowujesz funkcje. Wygląd jest tu nieistotny.
 
@@ -673,7 +669,7 @@ useProfiles(): { profiles: Profile[]; activeProfile: Profile | null;
 
 ### A8 — Testy jednostkowe (może poczekać)
 
-**A · 2 h · 14 XI · zależy od: A4, A7**
+**A · zależy od: A4, A7**
 
 **Po co:** model pedałów, skręt i wskaźnik łącza to czyste funkcje — łatwo je przetestować, a testy przydadzą się w rozdziale pracy o weryfikacji.
 
@@ -691,7 +687,7 @@ useProfiles(): { profiles: Profile[]; activeProfile: Profile | null;
 
 ### B1 — Czcionki i test kursywy
 
-**B · 3 h · 3–4 XI · zależy od: W1**
+**B · zależy od: W1**
 
 **Po co:** makiety stoją na dwóch czcionkach, a sekcja 11 każe na samym początku sprawdzić, czy iOS pochyli Saira Condensed (nie ma ona wersji kursywnej).
 
@@ -729,13 +725,13 @@ useProfiles(): { profiles: Profile[]; activeProfile: Profile | null;
 
 ### B2 — Motyw z makiet (theme.ts)
 
-**B · 2 h · 4 XI · zależy od: W1**
+**B · zależy od: W1**
 
 **Po co:** wszystkie kolory, czcionki i odstępy w jednym pliku. Wartości poniżej pochodzą z aktualnego kodu makiet (`WebCar - all screens.html`); sprawdźcie je w Chrome (DevTools → Inspect) przy pierwszych ekranach.
 
 ```ts
 export const colors = {
-  bg: '#000000',            // tło ekranów
+  background: '#000000',    // tło ekranów
   surface: '#0d0e10',       // kafelki, karty, popupy
   surface2: '#111214',
   surfaceLow: '#0b0c0e',    // wiersze list (HORN), tło rysunku auta, nieaktywny CRUISE
@@ -748,7 +744,7 @@ export const colors = {
   muted2: '#9a9da2',        // HELLO KAROL
   muted3: '#8e9095',        // numery na listach (01 BEEP)
   disabled: '#3a3c40',      // zgaszone kreski i elementy
-  disabledBg: '#1a1b1e',    // tło nieaktywnego DRIVE (08A)
+  disabledBackground: '#1a1b1e', // tło nieaktywnego DRIVE (08A)
   dim: '#4b4e52',           // napis i strzałki nieaktywnego DRIVE, ramki na ekranie jazdy
   onAccent: '#111214',      // napis na żółtym przycisku
   accent: '#F0B429',        // żółty: DRIVE, CREATE, zaznaczenie
@@ -777,11 +773,11 @@ Lista nie obejmuje rzadkich odcieni z makiet (np. `#7d8085` — MIN/MAX w statys
 
 ### B3 — Nawigacja i ekrany-zaślepki
 
-**B · 3 h · 5 XI · zależy od: W1**
+**B · zależy od: W1**
 
 **Po co:** cała mapa ekranów istnieje od pierwszego tygodnia, więc każde może pracować na swoim ekranie bez czekania.
 
-1. `app/_layout.tsx`: `GestureHandlerRootView` (styl `flex: 1`) → providery (później `ConnectionProvider` i `ProfileProvider`) → `<Stack screenOptions={{ headerShown: false, contentStyle: { backgroundColor: colors.bg } }} />`.
+1. `app/_layout.tsx`: `GestureHandlerRootView` (styl `flex: 1`) → providery (później `ConnectionProvider` i `ProfileProvider`) → `<Stack screenOptions={{ headerShown: false, contentStyle: { backgroundColor: colors.background } }} />`.
 2. Pliki tras jak w strukturze projektu: `index`, `menu`, `drive`, `profiles`, `drive-settings`, `light-sound`, `radio`, `telemetry`, `dev`. Każda zaślepka: tytuł ekranu i napis TODO.
 3. Opcje tras: `menu` z `presentation: 'transparentModal'` i `animation: 'fade'`; `drive` z `gestureEnabled: false`.
 4. Orientacja: w `_layout` przy starcie `ScreenOrientation.lockAsync(ScreenOrientation.OrientationLock.PORTRAIT_UP)`.
@@ -795,7 +791,7 @@ Lista nie obejmuje rzadkich odcieni z makiet (np. `#7d8085` — MIN/MAX w statys
 
 ### B4 — Baza SQLite i repozytorium profili
 
-**B · 5 h · 6–8 XI · zależy od: W1**
+**B · zależy od: W1**
 
 **Po co:** profile i historia sesji żyją w SQLite (sekcja 7). Schemat obu tabel ustalacie teraz, żeby w Sprincie 3 A tylko zapisywał sesje.
 
@@ -886,7 +882,7 @@ Lista nie obejmuje rzadkich odcieni z makiet (np. `#7d8085` — MIN/MAX w statys
 
 ### B5 — ProfileProvider i useProfiles
 
-**B · 2 h · 9 XI · zależy od: B4**
+**B · zależy od: B4**
 
 1. `src/state/ProfileContext.tsx`: przy starcie ładuje `profiles` i `activeProfile`.
 2. Akcje `activate(id)`, `create(name)`, `rename(id, name)`, `remove(id)`, `update(id, changes)` — każda woła repozytorium, a potem `reload()`.
@@ -901,7 +897,7 @@ Lista nie obejmuje rzadkich odcieni z makiet (np. `#7d8085` — MIN/MAX w statys
 
 ### B6 — Komponenty bazowe
 
-**B · 7 h · 9–11 XI · zależy od: B1, B2**
+**B · zależy od: B1, B2**
 
 **Po co:** te same elementy powtarzają się na 25 stanach makiet. Zrobione raz — w Sprincie 2 ekrany składa się z gotowych klocków.
 
@@ -909,7 +905,7 @@ Lista nie obejmuje rzadkich odcieni z makiet (np. `#7d8085` — MIN/MAX w statys
 |---|---|---|
 | `ScreenHeader({ title })` | żółta kreska 6×46 pochylona o −12°; nad tytułem „WEBCAR” (Label, accent); tytuł Heading 34; po prawej `MenuButton`; padding 30/22/22 | 10, 13, 14, 15, 17, 18 |
 | `MenuButton({ onPress })` | kwadrat 48×48, ramka 1,5 `border`, trzy paski 20×3 `text2` co 5 | wszystkie ekrany pionowe |
-| `PrimaryButton({ label, onPress, disabled, size, icon })` | tło accent, napis Heading 44 (DRIVE) albo 28 (pozostałe) w kolorze `onAccent`, po prawej dwie strzałki » (TEST HORN: ikona głośnika), ścięty prawy dolny róg 18 (DRIVE) albo 14; wyłączony: tło `disabledBg`, napis i strzałki `dim` (08A) | DRIVE, CREATE i SAVE (okna profilu), USE THIS PROFILE, TEST HORN, CLEAR HISTORY, START DRIVING, BACK TO DRIVING |
+| `PrimaryButton({ label, onPress, disabled, size, icon })` | tło accent, napis Heading 44 (DRIVE) albo 28 (pozostałe) w kolorze `onAccent`, po prawej dwie strzałki » (TEST HORN: ikona głośnika), ścięty prawy dolny róg 18 (DRIVE) albo 14; wyłączony: tło `disabledBackground`, napis i strzałki `dim` (08A) | DRIVE, CREATE i SAVE (okna profilu), USE THIS PROFILE, TEST HORN, CLEAR HISTORY, START DRIVING, BACK TO DRIVING |
 | `Button({ label, variant })` | wysokość 52, napis Heading 24; `outline`: ramka 1,5 `border`, napis `text2`; `danger`: tło danger, napis prawie czarny, ścięty róg 10 (CLOSE w 19 też ma ścięty róg) | outline: CANCEL, QUIT, CLOSE; danger: DELETE, CLEAR, RETRY |
 | `InfoTile({ label, children })` | tło surface, lewa krawędź 4 `borderSoft`, Label 12, wartość Heading 26 | Home (4 kafelki) |
 | `SignalBars({ level, color, size })` | 4 paski pochylone o −14°, odstęp 3; Home: szerokość 5, wysokości 9/14/19/24; ekran jazdy: szerokość 6, wysokości 10/16/22/28; zgaszone w kolorze `disabled` | Home, ekran jazdy |
@@ -930,7 +926,7 @@ Lista nie obejmuje rzadkich odcieni z makiet (np. `#7d8085` — MIN/MAX w statys
 
 ### B7 — Ekran Menu (09)
 
-**B · 2 h · 12 XI · zależy od: B3, B6**
+**B · zależy od: B3, B6**
 
 1. `app/menu.tsx` jak makieta 09: po lewej przyciemniony pasek poprzedniego ekranu (dotknięcie zamyka menu), po prawej panel z kreską, napisem WEBCAR i przyciskiem ✕. Pod spodem 6 pozycji: HOME, DRIVE SETTINGS, DRIVER PROFILES, RADIO, LIGHT & SOUND, TELEMETRY.
 2. Bieżący ekran wyróżniony: tło `accentTint`, napis i lewy pasek accent. Menu dostaje go w parametrze: `router.push({ pathname: '/menu', params: { from: '/radio' } })`.
@@ -943,7 +939,7 @@ Lista nie obejmuje rzadkich odcieni z makiet (np. `#7d8085` — MIN/MAX w statys
 
 ### B8 — Ekran Home (08, 08A)
 
-**B · 3 h · 12–13 XI · zależy od: B5, B6, A5**
+**B · zależy od: B5, B6, A5**
 
 1. Układ wg makiety 08, od góry: „HELLO ” + nazwa aktywnego profilu (Label 16, `muted2`; po pierwszym starcie HELLO DRIVER) i `MenuButton`; kreska 8×74 i „WEBCAR” (Heading 88 — może wychodzić za prawą krawędź, tak jest na makiecie); prostokąt 250 na rysunek auta (na razie pusty, ze ściętym rogiem); siatka 2×2 kafelków; DRIVE na dole.
 2. Kafelki: DRIVER = `activeProfile.name`; CONNECTION = `SignalBars` i ONLINE albo czerwony ✕ i OFFLINE (08A); STEERING = STICK/GYRO; POWER LIMIT = `powerLimit` % w kolorze accent.
@@ -959,7 +955,7 @@ Lista nie obejmuje rzadkich odcieni z makiet (np. `#7d8085` — MIN/MAX w statys
 
 ### B9 — Ekran /dev: katalog komponentów (może poczekać)
 
-**B · 1,5 h · 14 XI · zależy od: B6**
+**B · zależy od: B6**
 
 1. `app/dev.tsx`: wszystkie komponenty z B6 w każdym stanie — np. `PrimaryButton` aktywny i wyłączony, `SignalBars` od 0 do 4 w obu rozmiarach, `Dialog` z kwadracikiem i bez.
 2. Przyciski deweloperskie: „Reset bazy” (`resetDb()`), „Aktywuj następny profil” oraz „Profile z makiet” — dodaje profile z makiet i aktywuje KAROL, żeby ekrany dało się porównywać z makietami 1:1:
@@ -980,38 +976,46 @@ Lista nie obejmuje rzadkich odcieni z makiet (np. `#7d8085` — MIN/MAX w statys
 
 ## Czego potrzebujecie od Wojtasa i Wojtka i kiedy
 
-Aplikacja do końca Sprintu 1 nie potrzebuje auta, ale od Sprintu 2 każda funkcja musi być sprawdzona na prawdziwym ESP32. Uzgodnijcie te terminy na spotkaniu W2.
+Aplikacja do końca Sprintu 1 nie potrzebuje auta, ale od Sprintu 2 każda funkcja musi być sprawdzona na prawdziwym ESP32. Wiersze są w kolejności, w jakiej aplikacja ich potrzebuje.
 
-| Najpóźniej | Co firmware ma umieć | Do czego w aplikacji |
+| Sprint | Co firmware ma umieć | Do czego w aplikacji |
 |---|---|---|
-| 4 XI | protokół v1 zamrożony (W2), w tym skręt `s` −100…100 | symulator, typy, cała dalsza praca |
-| 12 XI | ESP32 w hotspocie ze stałym IP `172.20.10.13`, `WiFi.setSleep(false)`, serwer `/ws`: `hello`, `tel` (mogą być sztuczne wartości), `pong` | test W3, Home ONLINE/OFFLINE na prawdziwym aucie |
-| 22 XI | `drv`: PWM ESC i serwa — serwo proporcjonalnie do `s` (`1500 + s × 2,5` µs, obcięte do 1250…1750); failsafe 300 ms (moc 0 i koła prosto) | pierwsza jazda z aplikacji, koła w powietrzu |
-| 26 XI | E-STOP z zatrzaskiem i `es` w telemetrii; `act led` i gaszenie taśmy po zamknięciu połączenia albo 2 s bez wiadomości; `cfg`: `limit`, `blk`; kierunkowskazy (włączenie przy \|s\| ≥ ok. 30, wyłączenie poniżej ok. 20) i światła automatyczne | pełny ekran jazdy (Sprint 2) |
-| 29 XI | DFPlayer: `act horn` (dźwięk z `cfg.horn`), `act radio`, `r` w telemetrii, klakson w trybie advert; `cfg`: `vol`, `horn`, `led`, `bri`; zapis ustawień do NVS z opóźnieniem | klakson na ekranie jazdy, ekrany Light & sound i Radio (Sprint 2) |
-| 2 XII | kamera Xiao: CameraWebServer, stały IP `172.20.10.14`, `/stream` na porcie 81 | podgląd wideo, CAMERA OFF i CAMERA CONNECTION LOST (Sprint 3) |
-| 6 XII | czujniki ToF (`d1`, `d2`), auto-stop przy `c` = 1 i flaga `as`, pikanie przy cofaniu | tempomat z auto-stopem, statystyki sesji (Sprint 3) |
+| 1 | protokół v1 zamrożony (W2), w tym skręt `s` −100…100 | symulator, typy, cała dalsza praca |
+| 1 | ESP32 w hotspocie ze stałym IP `172.20.10.13`, `WiFi.setSleep(false)`, serwer `/ws`: `hello`, `tel` (mogą być sztuczne wartości), `pong` | test W3, Home ONLINE/OFFLINE na prawdziwym aucie |
+| 2 | `drv`: PWM ESC i serwa — serwo proporcjonalnie do `s` (`1500 + s × 2,5` µs, obcięte do 1250…1750); failsafe 300 ms (moc 0 i koła prosto) | pierwsza jazda z aplikacji, koła w powietrzu |
+| 2 | E-STOP z zatrzaskiem i `es` w telemetrii; `act led` i gaszenie taśmy po zamknięciu połączenia albo 2 s bez wiadomości; `cfg`: `limit`, `blk`; kierunkowskazy (włączenie przy \|s\| ≥ ok. 30, wyłączenie poniżej ok. 20) i światła automatyczne | pełny ekran jazdy (Sprint 2) |
+| 2 | DFPlayer: `act horn` (dźwięk z `cfg.horn`), `act radio`, `r` w telemetrii, klakson w trybie advert; `cfg`: `vol`, `horn`, `led`, `bri`; zapis ustawień do NVS z opóźnieniem | klakson na ekranie jazdy, ekrany Light & sound i Radio (Sprint 2) |
+| 3 | kamera Xiao: CameraWebServer, stały IP `172.20.10.14`, `/stream` na porcie 81 | podgląd wideo, CAMERA OFF i CAMERA CONNECTION LOST (Sprint 3) |
+| 3 | czujniki ToF (`d1`, `d2`), auto-stop przy `c` = 1 i flaga `as`, pikanie przy cofaniu | tempomat z auto-stopem, statystyki sesji (Sprint 3) |
 
 Kamera jest niezależna od głównego ESP32, więc jeśli Wojtas albo Wojtek ma wolną chwilę, warto ją uruchomić wcześniej — od razu z testem z sekcji 12 (pkt 8): czy WebView zgłasza błąd, gdy strumień zerwie się w trakcie. Symulator z A2 mogą traktować jako wzorzec zachowania serwera.
 
 ## Ryzyka i co ciąć, gdy zabraknie czasu
 
-Największe ryzyko to opóźniony firmware — dlatego symulator jest w pierwszym tygodniu, a jazda z aplikacji na aucie ma twardy termin 29 XI.
+Największe ryzyko to opóźniony firmware — dlatego symulator jest w pierwszym tygodniu, a jazda z aplikacji na aucie ma twardy termin: koniec Sprintu 2.
 
 | Ryzyko | Skutek | Co robicie |
 |---|---|---|
-| Firmware się spóźnia | integracja dopiero w grudniu, błędy wychodzą na końcu | symulator (A2); test W3 jak najwcześniej; jeśli 29 XI auto nie jedzie z aplikacji — rozmowa całego zespołu o priorytetach |
+| Firmware się spóźnia | integracja dopiero w Sprincie 3, błędy wychodzą na końcu | symulator (A2); test W3 jak najwcześniej; jeśli pod koniec Sprintu 2 auto nie jedzie z aplikacji — rozmowa całego zespołu o priorytetach |
 | Dwa palce naraz nie działają | ekran jazdy bezużyteczny | prototyp A7 w Sprincie 1; plan B z `Gesture.Manual()` opisany w A7 |
-| Serwo drga przy skręcie stopniowym (szum gestu albo akcelerometru) | koła „pływają”, auto jedzie nierówno | strefy martwe i wygładzanie GYRO w `config.ts` (sekcja 12); sprawdzić na prawdziwym serwie przy W3 albo 22 XI |
+| Serwo drga przy skręcie stopniowym (szum gestu albo akcelerometru) | koła „pływają”, auto jedzie nierówno | strefy martwe i wygładzanie GYRO w `config.ts` (sekcja 12); sprawdzić na prawdziwym serwie przy W3 albo przy pierwszej jeździe (Sprint 2) |
 | iOS nie pochyla Saira Condensed | napisy proste, inne niż makiety | test w B1 w pierwszych dniach; obejście `skewX` w jednym komponencie |
 | Adresy hotspotu inne niż `172.20.10.x` | aplikacja nie znajdzie auta | test W3; zmiana to jedna stała w firmware i jedna w `config.ts` |
-| WebView nie zgłasza zerwania strumienia kamery | CAMERA CONNECTION LOST (05A) się nie pokaże, obraz tylko zamarznie | sprawdzić przy uruchomieniu kamery (2 XII); obejście z sekcji 12: co 3 s odpytywać `http://172.20.10.14/status` |
+| WebView nie zgłasza zerwania strumienia kamery | CAMERA CONNECTION LOST (05A) się nie pokaże, obraz tylko zamarznie | sprawdzić przy uruchomieniu kamery; obejście z sekcji 12: co 3 s odpytywać `http://172.20.10.14/status` |
 | Expo wyda nowe SDK, a Expo Go na iPhonie się zaktualizuje | projekt przestaje się otwierać w Expo Go | aktualizacja projektu (`npx expo install expo@latest`, potem `npx expo install --fix`) — zarezerwujcie na to 2 h, gdyby się zdarzyło |
-| Sprint 1 za duży (35 h na osobę) | niedokończone fundamenty | tnijcie w tej kolejności: B9, A8, A6 (przechodzi do Sprintu 2); W3 zależy od firmware |
+| Sprint 1 za duży | niedokończone fundamenty | tnijcie w tej kolejności: B9, A8, A6 (przechodzi do Sprintu 2); W3 zależy od firmware |
 
-Jeśli w grudniu zabraknie czasu na całą aplikację: wymagania z sekcji 10 (sterowanie, wideo, telemetria, profile, historia sesji, dźwięk i światło) są nienaruszalne. Pierwszymi kandydatami do uproszczenia są tryb GYRO, rysunek auta na Home i dopracowanie animacji.
+Jeśli w Sprincie 3 zabraknie czasu na całą aplikację: wymagania z sekcji 10 (sterowanie, wideo, telemetria, profile, historia sesji, dźwięk i światło) są nienaruszalne. Pierwszymi kandydatami do uproszczenia są tryb GYRO, rysunek auta na Home i dopracowanie animacji.
 
 ## Zmiany w tej wersji
+
+### 1.3 (11 XI) — bez dat w planie, protokół v1.0
+
+- **Usunięte daty** z harmonogramu, tabeli zadań, nagłówków zadań i ryzyk; zostały tylko daty wersji dokumentów. Tabela firmware podaje sprint zamiast dnia.
+- **Usunięte szacunki czasu** z nagłówków zadań, tabeli zadań (kolumna „Czas”), sumy godzin i założenia czasu sprintu.
+- **Nazwy kolorów jak w `src/theme.ts`:** `colors.background` i `colors.disabledBackground` (było `bg` i `disabledBg`) w B2, B3 i B6.
+- **Bez review i spotkań:** usunięte przeglądy PR przez drugą osobę (podział pracy, zasady, kontrakt, Definition of Done, kolumna Review) i punkt o spotkaniach.
+- **W2 gotowe:** usunięty krok i punkt „Gotowe, gdy” o terminie testu W3. Protokół v1.0 zamrożony w kontekście v2.20.
 
 ### 1.2 (8 XI) — skręt stopniowy, plik w Markdown
 
