@@ -1,7 +1,7 @@
 # WebCar — aplikacja mobilna
 
 Aplikacja na iPhone'a do sterowania samochodem RC WebCar (React Native + Expo, tylko iOS).
-Opis działania, protokół i ekrany: `context/WebCar_kontekst.md`. Podział pracy i zadania: `context/WebCar_aplikacja_mobilna_podzial_pracy_i_plan_Sprintu_1.md`.
+Opis działania, protokół i ekrany: `context/WebCar_kontekst.md`. Podział pracy i zadania: `context/plan_sprintu_1.md`.
 
 ## Wymagania
 
@@ -62,11 +62,11 @@ Importy z `src/` przez alias `@/`, np. `import { ScreenStub } from '@/components
 ## Zasady pracy
 
 - `main` zawsze działa na iPhonie. Praca na gałęziach `a/A3-connection`, `b/B4-sqlite` (osoba + ID zadania).
-- Pull request → przegląd drugiej osoby → merge.
+- Pull request → merge.
 - Nazwy w kodzie po angielsku, formatowanie Prettier (formatowanie przy zapisie jest włączone w `.vscode/settings.json`).
 
 ## Decyzje
 
-- **W1 (7 XI 2026):** projekt z szablonu `create-expo-app` (Expo SDK 58). Ekrany zostają w `app/` w katalogu głównym,
+- **W1:** projekt z szablonu `create-expo-app` (Expo SDK 58). Ekrany zostają w `app/` w katalogu głównym,
   zgodnie z planem pracy — szablon domyślnie używa `src/app/`, ale cały plan i kontrakt odwołują się do `app/`.
-- **B1 — kursywa Saira Condensed (7 XI 2026):** `fontStyle: 'italic'` nie działa na iOS (Saira nie ma wersji kursywnej), więc nagłówki są pochylone przez `transform: [{ skewX: '-10deg' }]` w komponencie `Heading` (`src/components/Typography.tsx`). `fontFamily` ustawiamy tylko w `Typography.tsx` i `theme.ts`.
+- **B1 — kursywa Saira Condensed:** `fontStyle: 'italic'` nie działa na iOS (Saira nie ma wersji kursywnej), więc nagłówki są pochylone przez `transform: [{ skewX: '-10deg' }]` w komponencie `Heading` (`src/components/Typography.tsx`). `fontFamily` ustawiamy tylko w `Typography.tsx` i `theme.ts`.
