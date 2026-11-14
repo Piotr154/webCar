@@ -1,7 +1,8 @@
-import { router } from 'expo-router';
+import { router, useCanGoBack } from 'expo-router';
 import type { ReactNode } from 'react';
-import { Pressable, StyleSheet, Text } from 'react-native';
+import { Pressable, StyleSheet, Text, View } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
+
 import { colors, space } from '@/theme';
 
 type Props = {
@@ -9,19 +10,41 @@ type Props = {
   mockup: string;
   owner: 'A' | 'B';
   children?: ReactNode;
+  hideMenuButton?: boolean;
 };
 
-export function ScreenStub({ title, mockup, owner, children }: Props) {
+const HIT_SLOP = 16;
+
+export function ScreenStub({
+  title,
+  mockup,
+  owner,
+  children,
+  hideMenuButton,
+}: Props) {
+  const canGoBack = useCanGoBack();
+
   return (
     <SafeAreaView style={styles.container}>
-      <Text style={styles.title}>{title}</Text>
+      <View style={styles.header}>
+        <Text style={styles.title}>{title}</Text>
+        {!hideMenuButton && (
+          <Pressable hitSlop={HIT_SLOP} onPress={() => router.push('/menu')}>
+            <Text style={styles.menuText}>MENU ☰</Text>
+          </Pressable>
+        )}
+      </View>
       <Text style={styles.info}>
         makieta {mockup} · moduł {owner}
       </Text>
       <Text style={styles.todo}>TODO</Text>
       {children}
-      {router.canGoBack() && (
-        <Pressable style={styles.back} onPress={() => router.back()}>
+      {canGoBack && (
+        <Pressable
+          style={styles.back}
+          hitSlop={HIT_SLOP}
+          onPress={() => router.back()}
+        >
           <Text style={styles.backText}>‹ WSTECZ</Text>
         </Pressable>
       )}
@@ -31,7 +54,14 @@ export function ScreenStub({ title, mockup, owner, children }: Props) {
 
 const styles = StyleSheet.create({
   container: { flex: 1, backgroundColor: colors.background, padding: space.l },
-  title: { color: colors.text, fontSize: 34, fontWeight: '700' },
+  header: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'space-between',
+    gap: space.m,
+  },
+  title: { color: colors.text, fontSize: 34, fontWeight: '700', flexShrink: 1 },
+  menuText: { color: colors.text2, fontSize: 18, fontWeight: '700' },
   info: { color: colors.muted2, fontSize: 13, marginTop: 4 },
   todo: {
     color: colors.accent,
