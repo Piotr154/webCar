@@ -5,25 +5,19 @@ import { StyleSheet, Text } from 'react-native';
 
 const SCREENS = [
   { href: '/drive', label: 'DRIVE' },
-  { href: '/menu', label: 'MENU' },
-  { href: '/profiles', label: 'DRIVER PROFILES' },
-  { href: '/drive-settings', label: 'DRIVE SETTINGS' },
-  { href: '/light-sound', label: 'LIGHT & SOUND' },
-  { href: '/radio', label: 'RADIO' },
-  { href: '/telemetry', label: 'TELEMETRY' },
   { href: '/dev', label: 'DEV' },
 ] as const;
 
 export default function HomeScreen() {
   return (
-    <ScreenStub title="WEBCAR — HOME" mockup="08, 08A" owner="B">
+    <ScreenStub title="WEBCAR" mockup="08, 08A" owner="B">
       {SCREENS.map((s) => (
         <Link key={s.href} href={s.href} style={styles.link}>
           {s.label} ›
         </Link>
       ))}
       <Text style={styles.note}>
-        Tymczasowa lista ekranów do testów nawigacji.
+        Tymczasowe linki. Pozostałe ekrany są w MENU.
       </Text>
     </ScreenStub>
   );
