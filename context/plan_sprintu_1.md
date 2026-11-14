@@ -1,6 +1,6 @@
 # WebCar — aplikacja mobilna: podział pracy i plan Sprintu 1
 
-Stan: 14 listopada 2026 · wersja dokumentu 1.6 · zgodna z kontekstem v2.22 i makietami z 3 XI (lista zmian na końcu)
+Stan: 14 listopada 2026 · wersja dokumentu 1.7 · zgodna z kontekstem v2.23 i makietami z 3 XI (lista zmian na końcu)
 
 ## W skrócie
 
@@ -196,7 +196,7 @@ useProfiles(): { profiles: Profile[]; activeProfile: Profile | null;
 | B1 | Czcionki i test kursywy | B | W1 | Musi | Gotowe |
 | B2 | Motyw z makiet (`theme.ts`) | B | W1 | Musi | Gotowe |
 | B3 | Nawigacja i ekrany-zaślepki | B | W1 | Musi | W toku |
-| B4 | Baza SQLite i repozytorium profili | B | W1 | Musi | Do zrobienia |
+| B4 | Baza SQLite i repozytorium profili | B | W1 | Musi | Gotowe |
 | B5 | `ProfileProvider` i `useProfiles` | B | B4 | Musi | Do zrobienia |
 | B6 | Komponenty bazowe | B | B1, B2 | Musi | Do zrobienia |
 | B7 | Ekran Menu (09) | B | B3, B6 | Musi | Do zrobienia |
@@ -1011,6 +1011,10 @@ Największe ryzyko to opóźniony firmware — dlatego symulator jest w pierwszy
 Jeśli w Sprincie 3 zabraknie czasu na całą aplikację: wymagania z sekcji 10 (sterowanie, wideo, telemetria, profile, historia sesji, dźwięk i światło) są nienaruszalne. Pierwszymi kandydatami do uproszczenia są tryb GYRO, rysunek auta na Home i dopracowanie animacji.
 
 ## Zmiany w tej wersji
+
+### 1.7 (14 XI) — B4 gotowe
+
+- **B4 gotowe:** `src/db/db.ts` i `src/db/profiles.ts`. `getActiveProfile()` jest dostępne dla A6.
 
 ### 1.6 (14 XI) — zasady commitów i PR
 
