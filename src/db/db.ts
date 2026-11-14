@@ -17,8 +17,8 @@ const SCHEMA_V1 = `
   );
 
   CREATE TABLE app_state (
-    key TEXT PRIMARY KEY,
-    value TEXT NOT NULL
+    id INTEGER PRIMARY KEY CHECK (id = 1),
+    active_profile_id INTEGER NOT NULL REFERENCES profiles(id)
   );
 
   CREATE TABLE sessions (
@@ -42,6 +42,9 @@ export function getDb() {
   if (!dbPromise) {
     dbPromise = SQLite.openDatabaseAsync('webcar.db')
       .then(async (db) => {
+        // SQLite domyślnie ignoruje REFERENCES. To ustawienie nie zapisuje się w pliku bazy,
+        // więc trzeba je włączać po każdym otwarciu.
+        await db.execAsync('PRAGMA foreign_keys = ON');
         await migrate(db);
         return db;
       })
@@ -70,8 +73,8 @@ async function seedDefaultProfile(db: SQLite.SQLiteDatabase) {
     "INSERT INTO profiles (name) VALUES ('DRIVER')",
   );
   await db.runAsync(
-    "INSERT INTO app_state (key, value) VALUES ('active_profile_id', ?)",
-    String(result.lastInsertRowId),
+    'INSERT INTO app_state (id, active_profile_id) VALUES (1, ?)',
+    result.lastInsertRowId,
   );
 }
 
@@ -79,8 +82,8 @@ export async function resetDb() {
   const db = await getDb();
   await db.withTransactionAsync(async () => {
     await db.execAsync(`
-      DROP TABLE IF EXISTS profiles;
       DROP TABLE IF EXISTS app_state;
+      DROP TABLE IF EXISTS profiles;
       DROP TABLE IF EXISTS sessions;
       PRAGMA user_version = 0;
     `);
