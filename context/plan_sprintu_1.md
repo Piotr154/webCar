@@ -1,6 +1,6 @@
 # WebCar — aplikacja mobilna: podział pracy i plan Sprintu 1
 
-Stan: 14 listopada 2026 · wersja dokumentu 1.5 · zgodna z kontekstem v2.22 i makietami z 3 XI (lista zmian na końcu)
+Stan: 14 listopada 2026 · wersja dokumentu 1.6 · zgodna z kontekstem v2.22 i makietami z 3 XI (lista zmian na końcu)
 
 ## W skrócie
 
@@ -93,6 +93,7 @@ Kolejność jest celowa: najbardziej ryzykowne rzeczy (łączność, multi-touch
 Gałąź `main` zawsze działa na iPhonie.
 
 - **Repo:** `Piotr154/webCar` na GitHubie. Praca na gałęziach `a/A3-connection`, `b/B4-sqlite` (osoba + ID zadania). Pull request → merge.
+- **Commity i PR po polsku.** Opis commita i tytuł PR: `ID: co zmienia`, np. `A2: symulator auta`. Zmiany samej dokumentacji: `Kontekst v2.22, plan 1.5: co zmienia`. W opisie PR krótko, co się zmienia, i linijka `Closes #10` z numerem issue zadania — GitHub zamknie je po merge'u. Numer issue to nie ID zadania (A2 = #10), sprawdź go na tablicy.
 - **Tablica:** GitHub Projects z kolumnami Do zrobienia / W toku / Gotowe. Każde zadanie z tego dokumentu to jedno issue z tym samym ID.
 - **Kod:** TypeScript bez przesady — wystarczą typy protokołu i profilu. Nazwy w kodzie po angielsku, formatowanie Prettier. Wszystkie stałe aplikacji z sekcji 12 kontekstu w jednym pliku `src/config.ts`.
 - **Kontrakt:** pliki `src/connection/protocol.ts`, `src/connection/connection.ts`, `src/connection/sync.ts`, `src/db/profiles.ts` i oba konteksty zmienia tylko właściciel.
@@ -1010,6 +1011,10 @@ Największe ryzyko to opóźniony firmware — dlatego symulator jest w pierwszy
 Jeśli w Sprincie 3 zabraknie czasu na całą aplikację: wymagania z sekcji 10 (sterowanie, wideo, telemetria, profile, historia sesji, dźwięk i światło) są nienaruszalne. Pierwszymi kandydatami do uproszczenia są tryb GYRO, rysunek auta na Home i dopracowanie animacji.
 
 ## Zmiany w tej wersji
+
+### 1.6 (14 XI) — zasady commitów i PR
+
+- **Zasady pracy:** commity i PR po polsku, tytuł PR jak opis commita (`ID: co zmienia`), w opisie PR `Closes #numer` z numerem issue zadania.
 
 ### 1.5 (14 XI) — A1 gotowe
 
