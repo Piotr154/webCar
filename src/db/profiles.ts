@@ -1,7 +1,5 @@
 import { getDb } from '@/db/db';
 
-const ACTIVE_PROFILE_KEY = 'active_profile_id';
-
 export type Profile = {
   id: number;
   name: string;
@@ -60,14 +58,13 @@ export async function getProfile(id: number): Promise<Profile | null> {
 
 async function getActiveProfileId(): Promise<number> {
   const db = await getDb();
-  const row = await db.getFirstAsync<{ value: string }>(
-    'SELECT value FROM app_state WHERE key = ?',
-    ACTIVE_PROFILE_KEY,
+  const row = await db.getFirstAsync<{ active_profile_id: number }>(
+    'SELECT active_profile_id FROM app_state WHERE id = 1',
   );
   if (!row) {
     throw new Error('No active profile set');
   }
-  return Number(row.value);
+  return row.active_profile_id;
 }
 
 export async function getActiveProfile(): Promise<Profile> {
@@ -116,9 +113,8 @@ export async function setActiveProfile(id: number): Promise<void> {
   }
   const db = await getDb();
   await db.runAsync(
-    'UPDATE app_state SET value = ? WHERE key = ?',
-    String(id),
-    ACTIVE_PROFILE_KEY,
+    'UPDATE app_state SET active_profile_id = ? WHERE id = 1',
+    id,
   );
 }
 

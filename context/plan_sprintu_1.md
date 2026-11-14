@@ -1,6 +1,6 @@
 # WebCar — aplikacja mobilna: podział pracy i plan Sprintu 1
 
-Stan: 14 listopada 2026 · wersja dokumentu 1.8 · zgodna z kontekstem v2.24 i makietami z 3 XI (lista zmian na końcu)
+Stan: 15 listopada 2026 · wersja dokumentu 1.9 · zgodna z kontekstem v2.25 i makietami z 3 XI (lista zmian na końcu)
 
 ## W skrócie
 
@@ -798,7 +798,7 @@ Lista nie obejmuje rzadkich odcieni z makiet (np. `#7d8085` — MIN/MAX w statys
 
 **Po co:** profile i historia sesji żyją w SQLite (sekcja 7). Schemat obu tabel ustalacie teraz, żeby w Sprincie 3 A tylko zapisywał sesje.
 
-1. `src/db/db.ts` — jedna baza dla całej aplikacji, dostępna także spoza komponentów (A6 jej potrzebuje):
+1. `src/db/db.ts` — jedna baza dla całej aplikacji, dostępna także spoza komponentów (A6 jej potrzebuje). Bazę otwieramy tylko przez `getDb()`: tam włączamy klucze obce (`PRAGMA foreign_keys = ON` — SQLite domyślnie je ignoruje, a ustawienie nie zapisuje się w pliku, więc trzeba je włączać po każdym otwarciu) i uruchamiamy migrację:
 
    ```ts
    import * as SQLite from 'expo-sqlite';
@@ -808,6 +808,7 @@ Lista nie obejmuje rzadkich odcieni z makiet (np. `#7d8085` — MIN/MAX w statys
    export function getDb() {
      if (!dbPromise) {
        dbPromise = SQLite.openDatabaseAsync('webcar.db').then(async (db) => {
+         await db.execAsync('PRAGMA foreign_keys = ON');
          await migrate(db);
          return db;
        });
@@ -841,7 +842,10 @@ Lista nie obejmuje rzadkich odcieni z makiet (np. `#7d8085` — MIN/MAX w statys
      volume INTEGER NOT NULL DEFAULT 15,           -- 0–30 → cfg.vol
      radio INTEGER NOT NULL DEFAULT 0              -- 0 = OFF, 1–5 → act radio
    );
-   CREATE TABLE app_state (key TEXT PRIMARY KEY, value TEXT NOT NULL);   -- 'active_profile_id'
+   CREATE TABLE app_state (                       -- zawsze dokładnie jeden wiersz
+     id INTEGER PRIMARY KEY CHECK (id = 1),
+     active_profile_id INTEGER NOT NULL REFERENCES profiles(id)   -- baza nie pozwoli wskazać nieistniejącego profilu ani usunąć aktywnego
+   );
    CREATE TABLE sessions (
      id INTEGER PRIMARY KEY AUTOINCREMENT,
      started_at TEXT NOT NULL,           -- ISO; czas nadaje aplikacja (auto nie ma zegara)
@@ -861,8 +865,8 @@ Lista nie obejmuje rzadkich odcieni z makiet (np. `#7d8085` — MIN/MAX w statys
    ```ts
    async function seedDefaultProfile(db: SQLite.SQLiteDatabase) {
      const r = await db.runAsync("INSERT INTO profiles (name) VALUES ('DRIVER')");
-     await db.runAsync("INSERT INTO app_state (key, value) VALUES ('active_profile_id', ?)",
-       String(r.lastInsertRowId));
+     await db.runAsync('INSERT INTO app_state (id, active_profile_id) VALUES (1, ?)',
+       r.lastInsertRowId);
    }
    ```
 
@@ -1011,6 +1015,10 @@ Największe ryzyko to opóźniony firmware — dlatego symulator jest w pierwszy
 Jeśli w Sprincie 3 zabraknie czasu na całą aplikację: wymagania z sekcji 10 (sterowanie, wideo, telemetria, profile, historia sesji, dźwięk i światło) są nienaruszalne. Pierwszymi kandydatami do uproszczenia są tryb GYRO, rysunek auta na Home i dopracowanie animacji.
 
 ## Zmiany w tej wersji
+
+### 1.9 (15 XI) — `app_state` z kluczem obcym
+
+- **B4, poprawka schematu:** `app_state` zamiast słownika `key`/`value` ma jeden wiersz (`id = 1`) z kolumną `active_profile_id INTEGER NOT NULL REFERENCES profiles(id)`. `getDb()` włącza `PRAGMA foreign_keys = ON` po każdym otwarciu; bazę otwieramy tylko przez `getDb()`. `resetDb()` usuwa `app_state` przed `profiles`. Migracja do v2 niepotrzebna — żaden ekran nie tworzył jeszcze bazy.
 
 ### 1.8 (14 XI) — B3 gotowe
 
