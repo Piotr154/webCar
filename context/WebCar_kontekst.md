@@ -1,6 +1,6 @@
 # WebCar — kontekst projektu
 
-Stan: 11 listopada 2026 · wersja dokumentu 2.20
+Stan: 14 listopada 2026 · wersja dokumentu 2.21
 
 ## 0. Jak korzystać z tego dokumentu
 
@@ -416,9 +416,9 @@ Wszystkie te biblioteki działają w Expo Go, więc do pisania i testowania wyst
 | Expo SDK | 58 (React Native 0.88, React 19.3, TypeScript 6) — Expo Go na iPhonie musi obsługiwać SDK 58 |
 | Node.js | wersja LTS, co najmniej 22.13; oboje programiści używają tej samej wersji głównej |
 | Repozytorium | `Piotr154/webCar` na GitHubie; aplikacja w katalogu głównym repo |
-| Ekrany | `app/` w katalogu głównym (nie `src/app/`, jak w nowym szablonie Expo) — zgodnie z planem pracy |
-| Pozostały kod | `src/` (`components`, `connection`, `drive`, `db`, `state`), import przez alias `@/`, np. `@/components/ScreenStub` |
-| Tekst | `src/components/Typography.tsx`: `Heading` (Saira Condensed, wielkie litery, pochylenie `skewX`), `Label` (JetBrains Mono 700, wielkie litery, rozstrzelenie), `Mono` (JetBrains Mono 500). `fontFamily` tylko w `Typography.tsx` i `theme.ts`. Czcionki ładuje `app/_layout.tsx`; ekran powitalny zostaje do końca ładowania |
+| Ekrany | `src/app/`, jak w szablonie Expo. Bez `app/` w katalogu głównym — expo-router użyłby tylko jednego z tych folderów |
+| Pozostały kod | `src/` (`app`, `components`, `connection`, `drive`, `db`, `state`), import przez alias `@/`, np. `@/components/ScreenStub` |
+| Tekst | `src/components/Typography.tsx`: `Heading` (Saira Condensed, wielkie litery, pochylenie `skewX`), `Label` (JetBrains Mono 700, wielkie litery, rozstrzelenie), `Mono` (JetBrains Mono 500). `fontFamily` tylko w `Typography.tsx` i `theme.ts`. Czcionki ładuje `src/app/_layout.tsx`; ekran powitalny zostaje do końca ładowania |
 | Motyw | `src/theme.ts`: `colors`, `underglowColors`, `fonts`, `space`, `overlay`. W ekranach i komponentach kolory tylko przez `colors.*`, bez wartości hex. |
 | Symulator auta | `tools/mock-car/` (zadanie A2) |
 | Formatowanie | Prettier (`singleQuote`), formatowanie przy zapisie w VS Code (`.vscode/settings.json`) |

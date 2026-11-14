@@ -1,6 +1,6 @@
 # WebCar — aplikacja mobilna: podział pracy i plan Sprintu 1
 
-Stan: 11 listopada 2026 · wersja dokumentu 1.3 · zgodna z kontekstem v2.20 i makietami z 3 XI (lista zmian na końcu)
+Stan: 14 listopada 2026 · wersja dokumentu 1.4 · zgodna z kontekstem v2.21 i makietami z 3 XI (lista zmian na końcu)
 
 ## W skrócie
 
@@ -22,7 +22,7 @@ Projekt aplikacji istnieje (Expo SDK 58): wszystkie ekrany są zaślepkami, logi
 
 | Plik | Zawartość | Znaczenie dla aplikacji |
 |---|---|---|
-| `context/WebCar_kontekst.md` (v2.20, 11 XI) | sprzęt, łączność (sekcja 3), zachowanie funkcji (4, 7), stack i stan prac (8), protokół (9), ekrany (11), stałe (12) | główne źródło — zadania niżej odwołują się do jego sekcji |
+| `context/WebCar_kontekst.md` (v2.21, 14 XI) | sprzęt, łączność (sekcja 3), zachowanie funkcji (4, 7), stack i stan prac (8), protokół (9), ekrany (11), stałe (12) | główne źródło — zadania niżej odwołują się do jego sekcji |
 | `context/WebCar_-_all_screens.html` | makiety 25 stanów ekranów (01–19, w tym 05A) | kolory, czcionki, teksty, układ; przy różnicy wygrywa opis z kontekstu |
 | `context/plan_sprintu_1.md` | ten plik: podział pracy, harmonogram, zadania Sprintu 1 | każde zadanie to jedno issue na GitHubie z tym samym ID |
 | `README.md` | uruchomienie projektu, komendy, struktura, decyzje (np. kursywa przez `skewX`) | pierwsze kroki po `git clone` |
@@ -124,18 +124,18 @@ Gałąź `main` zawsze działa na iPhonie.
 
 ```
 webCar/
-├─ app/                     ekrany (expo-router)
-│  ├─ _layout.tsx           czcionki, providery, Stack         B (+A: ConnectionProvider, start)
-│  ├─ index.tsx             08 Home                            B
-│  ├─ menu.tsx              09 Menu                            B
-│  ├─ drive.tsx             01–07 Jazda                        A
-│  ├─ profiles.tsx          10–11B Profile                     B
-│  ├─ drive-settings.tsx    13                                 B
-│  ├─ light-sound.tsx       14 (+19)                           B
-│  ├─ radio.tsx             18, 18A                            B
-│  ├─ telemetry.tsx         15–17                              B
-│  └─ dev.tsx               katalog komponentów (tylko dev)    B
 ├─ src/
+│  ├─ app/                  ekrany (expo-router)
+│  │  ├─ _layout.tsx        czcionki, providery, Stack         B (+A: ConnectionProvider, start)
+│  │  ├─ index.tsx          08 Home                            B
+│  │  ├─ menu.tsx           09 Menu                            B
+│  │  ├─ drive.tsx          01–07 Jazda                        A
+│  │  ├─ profiles.tsx       10–11B Profile                     B
+│  │  ├─ drive-settings.tsx 13                                 B
+│  │  ├─ light-sound.tsx    14 (+19)                           B
+│  │  ├─ radio.tsx          18, 18A                            B
+│  │  ├─ telemetry.tsx      15–17                              B
+│  │  └─ dev.tsx            katalog komponentów (tylko dev)    B
 │  ├─ config.ts             adresy + stałe aplikacji z sekcji 12   A
 │  ├─ theme.ts              kolory, czcionki, odstępy          B
 │  ├─ components/           wspólne komponenty UI              B
@@ -471,7 +471,7 @@ useProfiles(): { profiles: Profile[]; activeProfile: Profile | null;
 **Po co:** jedno miejsce, które utrzymuje połączenie z autem (sekcja 3: `send`, `onTelemetry`, `onStatusChange`). Reszta aplikacji nie zna szczegółów WebSocketa.
 
 1. `src/connection/connection.ts` jako zwykły moduł, nie komponent. Zmienne na poziomie modułu: `ws`, `status`, `lastTelAt`, `reconnectTimer`, zbiory słuchaczy (`Set`).
-2. `startConnection()` wołana raz w `app/_layout.tsx`. Flaga `started` chroni przed podwójnym startem po Fast Refresh.
+2. `startConnection()` wołana raz w `src/app/_layout.tsx`. Flaga `started` chroni przed podwójnym startem po Fast Refresh.
 3. `connect()`: `const socket = new WebSocket(CAR_WS_URL); ws = socket;`. W `onmessage` — `parseCarMessage`; dla `tel` ustaw `lastTelAt = Date.now()` i wywołaj słuchaczy; dla `hello` zapamiętaj `fw`.
 4. `onclose` i `onerror`: najpierw `if (socket !== ws) return;` (zdarzenia starego gniazda ignorujemy), potem `ws = null` i `scheduleReconnect()`.
 5. `scheduleReconnect()` — tylko jeden timer naraz: jeśli `reconnectTimer` istnieje, nic nie rób; inaczej `setTimeout(connect, RECONNECT_DELAY_MS)`.
@@ -543,7 +543,7 @@ useProfiles(): { profiles: Profile[]; activeProfile: Profile | null;
 1. `src/state/ConnectionContext.tsx`: provider subskrybuje moduł; ostatnia telemetria w `useRef`.
 2. `setInterval` co 250 ms liczy `{ status, bars, pingMs, telemetry, fw }` (jak w kontrakcie) i robi `setState` tylko przy zmianie — najwyżej 4 odświeżenia na sekundę.
 3. `useConnection()` zwraca ten stan oraz `send` i `retryNow`.
-4. Provider wstawiasz do `app/_layout.tsx` — to plik B, więc uzgodnij zmianę.
+4. Provider wstawiasz do `src/app/_layout.tsx` — to plik B, więc uzgodnij zmianę.
 5. Na Sprint 2: ekran jazdy reaguje na `as` i `es` natychmiast, więc subskrybuje `onTelemetry` bezpośrednio, nie przez kontekst.
 
 **Gotowe, gdy:**
@@ -576,7 +576,7 @@ useProfiles(): { profiles: Profile[]; activeProfile: Profile | null;
 
 **Po co:** sprawdzić teraz najbardziej ryzykowne rzeczy w całej aplikacji — dwa palce naraz, stabilne 20 Hz, płynny skręt proporcjonalny do wychylenia gałki i blokadę orientacji. W Sprincie 2 tylko dobudowujesz funkcje. Wygląd jest tu nieistotny.
 
-1. `app/drive.tsx`. W `_layout` dla tej trasy `gestureEnabled: false` — gest „wstecz” nie może przypadkiem zakończyć sesji.
+1. `src/app/drive.tsx`. W `_layout` dla tej trasy `gestureEnabled: false` — gest „wstecz” nie może przypadkiem zakończyć sesji.
 2. Orientacja i wygaszanie ekranu:
 
    ```ts
@@ -691,7 +691,7 @@ useProfiles(): { profiles: Profile[]; activeProfile: Profile | null;
 
 **Po co:** makiety stoją na dwóch czcionkach, a sekcja 11 każe na samym początku sprawdzić, czy iOS pochyli Saira Condensed (nie ma ona wersji kursywnej).
 
-1. Ładowanie czcionek w `app/_layout.tsx`:
+1. Ładowanie czcionek w `src/app/_layout.tsx`:
 
    ```tsx
    import { useFonts, SairaCondensed_700Bold } from '@expo-google-fonts/saira-condensed';
@@ -777,7 +777,7 @@ Lista nie obejmuje rzadkich odcieni z makiet (np. `#7d8085` — MIN/MAX w statys
 
 **Po co:** cała mapa ekranów istnieje od pierwszego tygodnia, więc każde może pracować na swoim ekranie bez czekania.
 
-1. `app/_layout.tsx`: `GestureHandlerRootView` (styl `flex: 1`) → providery (później `ConnectionProvider` i `ProfileProvider`) → `<Stack screenOptions={{ headerShown: false, contentStyle: { backgroundColor: colors.background } }} />`.
+1. `src/app/_layout.tsx`: `GestureHandlerRootView` (styl `flex: 1`) → providery (później `ConnectionProvider` i `ProfileProvider`) → `<Stack screenOptions={{ headerShown: false, contentStyle: { backgroundColor: colors.background } }} />`.
 2. Pliki tras jak w strukturze projektu: `index`, `menu`, `drive`, `profiles`, `drive-settings`, `light-sound`, `radio`, `telemetry`, `dev`. Każda zaślepka: tytuł ekranu i napis TODO.
 3. Opcje tras: `menu` z `presentation: 'transparentModal'` i `animation: 'fade'`; `drive` z `gestureEnabled: false`.
 4. Orientacja: w `_layout` przy starcie `ScreenOrientation.lockAsync(ScreenOrientation.OrientationLock.PORTRAIT_UP)`.
@@ -888,7 +888,7 @@ Lista nie obejmuje rzadkich odcieni z makiet (np. `#7d8085` — MIN/MAX w statys
 2. Akcje `activate(id)`, `create(name)`, `rename(id, name)`, `remove(id)`, `update(id, changes)` — każda woła repozytorium, a potem `reload()`.
 3. W `activate` po zapisie wywołaj `syncActiveProfile()` z A6 (sekcja 7: po aktywacji ustawienia i stacja radia od razu idą do auta). Do czasu A6 — komentarz TODO.
 4. W `update`: gdy zmieniasz aktywny profil, po zapisie też `syncActiveProfile()`. Z tego korzystają w Sprincie 2 ekrany Drive settings, Light & sound i Radio — autozapis bez SAVE (sekcja 7).
-5. Provider w `app/_layout.tsx`.
+5. Provider w `src/app/_layout.tsx`.
 
 **Gotowe, gdy:**
 
@@ -928,7 +928,7 @@ Lista nie obejmuje rzadkich odcieni z makiet (np. `#7d8085` — MIN/MAX w statys
 
 **B · zależy od: B3, B6**
 
-1. `app/menu.tsx` jak makieta 09: po lewej przyciemniony pasek poprzedniego ekranu (dotknięcie zamyka menu), po prawej panel z kreską, napisem WEBCAR i przyciskiem ✕. Pod spodem 6 pozycji: HOME, DRIVE SETTINGS, DRIVER PROFILES, RADIO, LIGHT & SOUND, TELEMETRY.
+1. `src/app/menu.tsx` jak makieta 09: po lewej przyciemniony pasek poprzedniego ekranu (dotknięcie zamyka menu), po prawej panel z kreską, napisem WEBCAR i przyciskiem ✕. Pod spodem 6 pozycji: HOME, DRIVE SETTINGS, DRIVER PROFILES, RADIO, LIGHT & SOUND, TELEMETRY.
 2. Bieżący ekran wyróżniony: tło `accentTint`, napis i lewy pasek accent. Menu dostaje go w parametrze: `router.push({ pathname: '/menu', params: { from: '/radio' } })`.
 3. Wyeksportuj listę pozycji jako `MENU_ITEMS` — A użyje jej w Sprincie 2 w menu na ekranie jazdy (07).
 
@@ -957,7 +957,7 @@ Lista nie obejmuje rzadkich odcieni z makiet (np. `#7d8085` — MIN/MAX w statys
 
 **B · zależy od: B6**
 
-1. `app/dev.tsx`: wszystkie komponenty z B6 w każdym stanie — np. `PrimaryButton` aktywny i wyłączony, `SignalBars` od 0 do 4 w obu rozmiarach, `Dialog` z kwadracikiem i bez.
+1. `src/app/dev.tsx`: wszystkie komponenty z B6 w każdym stanie — np. `PrimaryButton` aktywny i wyłączony, `SignalBars` od 0 do 4 w obu rozmiarach, `Dialog` z kwadracikiem i bez.
 2. Przyciski deweloperskie: „Reset bazy” (`resetDb()`), „Aktywuj następny profil” oraz „Profile z makiet” — dodaje profile z makiet i aktywuje KAROL, żeby ekrany dało się porównywać z makietami 1:1:
 
    | Profil | Kolor | Limit mocy | Pozostałe pola |
@@ -1008,6 +1008,10 @@ Największe ryzyko to opóźniony firmware — dlatego symulator jest w pierwszy
 Jeśli w Sprincie 3 zabraknie czasu na całą aplikację: wymagania z sekcji 10 (sterowanie, wideo, telemetria, profile, historia sesji, dźwięk i światło) są nienaruszalne. Pierwszymi kandydatami do uproszczenia są tryb GYRO, rysunek auta na Home i dopracowanie animacji.
 
 ## Zmiany w tej wersji
+
+### 1.4 (14 XI) — ekrany w `src/app/`
+
+- **Ekrany przeniesione z `app/` do `src/app/`**, jak w szablonie Expo. Zmienione drzewo struktury projektu i ścieżki w A3, A5, A7, B1, B3, B5, B7 i B9.
 
 ### 1.3 (11 XI) — bez dat w planie, protokół v1.0
 
