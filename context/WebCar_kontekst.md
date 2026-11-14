@@ -1,6 +1,6 @@
 # WebCar — kontekst projektu
 
-Stan: 14 listopada 2026 · wersja dokumentu 2.22
+Stan: 14 listopada 2026 · wersja dokumentu 2.23
 
 ## 0. Jak korzystać z tego dokumentu
 
@@ -446,7 +446,7 @@ Zadania i ich opis: plan Sprintu 1 (`context/plan_sprintu_1.md`). A = Piotrek (j
 | B1 | Czcionki i test kursywy | B | scalone do `main` (PR #3): ładowanie czcionek, test na iPhonie (kursywa przez `skewX`), `Typography.tsx`; ekran `/dev` pokazuje `Heading`, `Label` i `Mono` |
 | B2 | Motyw `theme.ts` | B | scalone do `main` (PR #2): `src/theme.ts`, ekrany i `ScreenStub` używają `colors.*` i `space.*` |
 | B3 | Nawigacja i ekrany-zaślepki | B | częściowo: `_layout.tsx` ze `Stack`, `GestureHandlerRootView` i `StatusBar`; zaślepki wszystkich ekranów (`ScreenStub`, tymczasowa lista ekranów na Home). Zostało: opcje tras (`menu` jako `transparentModal` + `fade`, `drive` z `gestureEnabled: false`), blokada pionu w `_layout`, płytki stos przy przejściach z menu |
-| B4 | SQLite i repozytorium profili | B | do zrobienia (potrzebne Piotrkowi do A6) |
+| B4 | SQLite i repozytorium profili | B | gotowe: `src/db/db.ts` (`getDb()`, schemat v1 z tabelami `profiles`, `app_state`, `sessions`, migracja przez `PRAGMA user_version`, profil startowy `DRIVER`, `resetDb()`), `src/db/profiles.ts` (typ `Profile` z kontraktu, `getProfiles`, `getProfile`, `getActiveProfile`, `setActiveProfile`, `createProfile`, `renameProfile`, `updateProfile`, `deleteProfile` — rzuca błąd dla aktywnego, `normalizeName`, `isNameValid`, `MAX_NAME_LENGTH` = 12). Piotrek może używać `getActiveProfile()` w A6 |
 | B5 | `ProfileProvider` i `useProfiles` | B | do zrobienia |
 | B6 | Komponenty bazowe | B | do zrobienia |
 | B7 | Ekran Menu (09) | B | do zrobienia |
