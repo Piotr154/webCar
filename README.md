@@ -47,7 +47,7 @@ Nie uruchamiajcie `npm audit fix --force` — podmienia wersje paczek na niezgod
 ## Struktura
 
 ```
-app/              ekrany (expo-router) — każdy plik to ekran
+src/app/          ekrany (expo-router) — każdy plik to ekran
 src/components/   wspólne komponenty UI (B)
 src/connection/   łączność z autem (A)
 src/drive/        model pedałów, pętla 20 Hz (A)
@@ -67,6 +67,5 @@ Importy z `src/` przez alias `@/`, np. `import { ScreenStub } from '@/components
 
 ## Decyzje
 
-- **W1:** projekt z szablonu `create-expo-app` (Expo SDK 58). Ekrany zostają w `app/` w katalogu głównym,
-  zgodnie z planem pracy — szablon domyślnie używa `src/app/`, ale cały plan i kontrakt odwołują się do `app/`.
+- **W1:** projekt z szablonu `create-expo-app` (Expo SDK 58). Ekrany w `src/app/`, jak w szablonie. Nie tworzymy `app/` w katalogu głównym — expo-router użyłby tylko jednego z tych folderów.
 - **B1 — kursywa Saira Condensed:** `fontStyle: 'italic'` nie działa na iOS (Saira nie ma wersji kursywnej), więc nagłówki są pochylone przez `transform: [{ skewX: '-10deg' }]` w komponencie `Heading` (`src/components/Typography.tsx`). `fontFamily` ustawiamy tylko w `Typography.tsx` i `theme.ts`.
