@@ -63,6 +63,7 @@ Importy z `src/` przez alias `@/`, np. `import { ScreenStub } from '@/components
 
 - `main` zawsze działa na iPhonie. Praca na gałęziach `a/A3-connection`, `b/B4-sqlite` (osoba + ID zadania).
 - Pull request → merge.
+- **Commity i PR po polsku.** Opis commita i tytuł PR: `ID: co zmienia`, np. `A2: symulator auta`. Zmiany samej dokumentacji: `Kontekst v2.22, plan 1.5: co zmienia`. W opisie PR krótko, co się zmienia, i linijka `Closes #10` z numerem issue zadania — GitHub zamknie je po merge'u. Numer issue to nie ID zadania (A2 = #10), sprawdź go na tablicy.
 - Nazwy w kodzie po angielsku, formatowanie Prettier (formatowanie przy zapisie jest włączone w `.vscode/settings.json`).
 
 ## Decyzje
