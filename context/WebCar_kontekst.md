@@ -1,6 +1,6 @@
 # WebCar — kontekst projektu
 
-Stan: 14 listopada 2026 · wersja dokumentu 2.21
+Stan: 14 listopada 2026 · wersja dokumentu 2.22
 
 ## 0. Jak korzystać z tego dokumentu
 
@@ -441,7 +441,8 @@ Zadania i ich opis: plan Sprintu 1 (`context/plan_sprintu_1.md`). A = Piotrek (j
 | W1 | Kickoff i setup projektu | A+B | scalone do `main` (PR #1): projekt, biblioteki, `app.json`, foldery, Prettier, ESLint; uruchomienie u obojga z czystego `git clone` i tablica GitHub Projects — gotowe |
 | W2 | Protokół v1 z Wojtasem i Wojtkiem | A+B | gotowe — protokół v1.0 zamrożony, potwierdzony przez Wojtasa i Wojtka (sekcja 9) |
 | W3 | Test hotspot + ESP32 + aplikacja | A+B | czeka na firmware |
-| A1–A8 | typy i config, symulator, łączność, ping, provider, sync, prototyp jazdy, testy | A | nierozpoczęte |
+| A1 | Typy protokołu i `config.ts` | A | gotowe: `src/connection/protocol.ts` (typy wiadomości z sekcji 9, `parseCarMessage` sprawdza tylko pole `t`), `src/config.ts` (adresy i stałe z sekcji 12; IP symulatora z `Constants.expoConfig.hostUri`) |
+| A2–A8 | symulator, łączność, ping, provider, sync, prototyp jazdy, testy | A | nierozpoczęte |
 | B1 | Czcionki i test kursywy | B | scalone do `main` (PR #3): ładowanie czcionek, test na iPhonie (kursywa przez `skewX`), `Typography.tsx`; ekran `/dev` pokazuje `Heading`, `Label` i `Mono` |
 | B2 | Motyw `theme.ts` | B | scalone do `main` (PR #2): `src/theme.ts`, ekrany i `ScreenStub` używają `colors.*` i `space.*` |
 | B3 | Nawigacja i ekrany-zaślepki | B | częściowo: `_layout.tsx` ze `Stack`, `GestureHandlerRootView` i `StatusBar`; zaślepki wszystkich ekranów (`ScreenStub`, tymczasowa lista ekranów na Home). Zostało: opcje tras (`menu` jako `transparentModal` + `fade`, `drive` z `gestureEnabled: false`), blokada pionu w `_layout`, płytki stos przy przejściach z menu |

@@ -1,6 +1,6 @@
 # WebCar — aplikacja mobilna: podział pracy i plan Sprintu 1
 
-Stan: 14 listopada 2026 · wersja dokumentu 1.4 · zgodna z kontekstem v2.21 i makietami z 3 XI (lista zmian na końcu)
+Stan: 14 listopada 2026 · wersja dokumentu 1.5 · zgodna z kontekstem v2.22 i makietami z 3 XI (lista zmian na końcu)
 
 ## W skrócie
 
@@ -22,7 +22,7 @@ Projekt aplikacji istnieje (Expo SDK 58): wszystkie ekrany są zaślepkami, logi
 
 | Plik | Zawartość | Znaczenie dla aplikacji |
 |---|---|---|
-| `context/WebCar_kontekst.md` (v2.21, 14 XI) | sprzęt, łączność (sekcja 3), zachowanie funkcji (4, 7), stack i stan prac (8), protokół (9), ekrany (11), stałe (12) | główne źródło — zadania niżej odwołują się do jego sekcji |
+| `context/WebCar_kontekst.md` (v2.22, 14 XI) | sprzęt, łączność (sekcja 3), zachowanie funkcji (4, 7), stack i stan prac (8), protokół (9), ekrany (11), stałe (12) | główne źródło — zadania niżej odwołują się do jego sekcji |
 | `context/WebCar_-_all_screens.html` | makiety 25 stanów ekranów (01–19, w tym 05A) | kolory, czcionki, teksty, układ; przy różnicy wygrywa opis z kontekstu |
 | `context/plan_sprintu_1.md` | ten plik: podział pracy, harmonogram, zadania Sprintu 1 | każde zadanie to jedno issue na GitHubie z tym samym ID |
 | `README.md` | uruchomienie projektu, komendy, struktura, decyzje (np. kursywa przez `skewX`) | pierwsze kroki po `git clone` |
@@ -184,7 +184,7 @@ useProfiles(): { profiles: Profile[]; activeProfile: Profile | null;
 |---|---|---|---|---|---|
 | W1 | Kickoff i setup projektu (razem) | A+B | — | Musi | Gotowe |
 | W2 | Protokół v1 uzgodniony z Wojtasem i Wojtkiem | A+B | — | Musi | Gotowe |
-| A1 | Typy protokołu i `config.ts` | A | W1, W2 | Musi | Do zrobienia |
+| A1 | Typy protokołu i `config.ts` | A | W1, W2 | Musi | Gotowe |
 | A2 | Symulator auta | A | A1 | Musi | Do zrobienia |
 | A3 | Moduł łączności | A | A1, A2 | Musi | Do zrobienia |
 | A4 | Ping i wskaźnik jakości łącza | A | A3 | Musi | Do zrobienia |
@@ -342,8 +342,10 @@ useProfiles(): { profiles: Profile[]; activeProfile: Profile | null;
 3. `src/config.ts`:
 
    ```ts
+   import Constants from 'expo-constants';
+
    export const USE_MOCK = true;                    // false = prawdziwe auto
-   export const MOCK_HOST = '192.168.0.10';         // IP laptopa (macOS: ipconfig getifaddr en0)
+   const MOCK_HOST = Constants.expoConfig?.hostUri?.split(':')[0] ?? 'localhost';  // IP laptopa, z którego Expo Go pobrało aplikację
    export const CAR_WS_URL = USE_MOCK ? `ws://${MOCK_HOST}:8080/ws` : 'ws://172.20.10.13/ws';
    export const CAMERA_URL = 'http://172.20.10.14:81/stream';
 
@@ -1008,6 +1010,11 @@ Największe ryzyko to opóźniony firmware — dlatego symulator jest w pierwszy
 Jeśli w Sprincie 3 zabraknie czasu na całą aplikację: wymagania z sekcji 10 (sterowanie, wideo, telemetria, profile, historia sesji, dźwięk i światło) są nienaruszalne. Pierwszymi kandydatami do uproszczenia są tryb GYRO, rysunek auta na Home i dopracowanie animacji.
 
 ## Zmiany w tej wersji
+
+### 1.5 (14 XI) — A1 gotowe
+
+- **A1 gotowe:** `src/connection/protocol.ts` i `src/config.ts`.
+- **`MOCK_HOST` z Expo zamiast IP na sztywno:** adres laptopa z `Constants.expoConfig.hostUri`, więc nie trzeba go zmieniać przy każdej sieci ani osobno u każdej osoby.
 
 ### 1.4 (14 XI) — ekrany w `src/app/`
 
