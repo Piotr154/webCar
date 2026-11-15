@@ -107,6 +107,9 @@ export function isNameValid(
   );
 }
 
+// Między tym sprawdzeniem a UPDATE inny kod może usunąć ten profil.
+// Wtedy baza odrzuci UPDATE, bo active_profile_id ma klucz obcy do profiles,
+// więc brak withExclusiveTransactionAsync nie szkodzi.
 export async function setActiveProfile(id: number): Promise<void> {
   if (!(await getProfile(id))) {
     throw new Error(`Profile ${id} not found`);
@@ -145,6 +148,9 @@ export async function renameProfile(id: number, name: string): Promise<void> {
   );
 }
 
+// Między tym sprawdzeniem a DELETE inny kod może ustawić ten profil jako aktywny.
+// Wtedy baza odrzuci DELETE, bo active_profile_id ma klucz obcy do profiles,
+// więc brak withExclusiveTransactionAsync nie szkodzi.
 export async function deleteProfile(id: number): Promise<void> {
   const activeId = await getActiveProfileId();
   if (id === activeId) {
