@@ -1,6 +1,6 @@
 # WebCar — aplikacja mobilna: podział pracy i plan Sprintu 1
 
-Stan: 15 listopada 2026 · wersja dokumentu 1.9 · zgodna z kontekstem v2.25 i makietami z 3 XI (lista zmian na końcu)
+Stan: 16 listopada 2026 · wersja dokumentu 1.10 · zgodna z kontekstem v2.26 i makietami z 3 XI (lista zmian na końcu)
 
 ## W skrócie
 
@@ -22,7 +22,7 @@ Projekt aplikacji istnieje (Expo SDK 58): wszystkie ekrany są zaślepkami, logi
 
 | Plik | Zawartość | Znaczenie dla aplikacji |
 |---|---|---|
-| `context/WebCar_kontekst.md` (v2.22, 14 XI) | sprzęt, łączność (sekcja 3), zachowanie funkcji (4, 7), stack i stan prac (8), protokół (9), ekrany (11), stałe (12) | główne źródło — zadania niżej odwołują się do jego sekcji |
+| `context/WebCar_kontekst.md` (v2.26, 16 XI) | sprzęt, łączność (sekcja 3), zachowanie funkcji (4, 7), stack i stan prac (8), protokół (9), ekrany (11), stałe (12) | główne źródło — zadania niżej odwołują się do jego sekcji |
 | `context/WebCar_-_all_screens.html` | makiety 25 stanów ekranów (01–19, w tym 05A) | kolory, czcionki, teksty, układ; przy różnicy wygrywa opis z kontekstu |
 | `context/plan_sprintu_1.md` | ten plik: podział pracy, harmonogram, zadania Sprintu 1 | każde zadanie to jedno issue na GitHubie z tym samym ID |
 | `README.md` | uruchomienie projektu, komendy, struktura, decyzje (np. kursywa przez `skewX`) | pierwsze kroki po `git clone` |
@@ -186,7 +186,7 @@ useProfiles(): { profiles: Profile[]; activeProfile: Profile | null;
 | W1 | Kickoff i setup projektu (razem) | A+B | — | Musi | Gotowe |
 | W2 | Protokół v1 uzgodniony z Wojtasem i Wojtkiem | A+B | — | Musi | Gotowe |
 | A1 | Typy protokołu i `config.ts` | A | W1, W2 | Musi | Gotowe |
-| A2 | Symulator auta | A | A1 | Musi | Do zrobienia |
+| A2 | Symulator auta | A | A1 | Musi | Gotowe |
 | A3 | Moduł łączności | A | A1, A2 | Musi | Do zrobienia |
 | A4 | Ping i wskaźnik jakości łącza | A | A3 | Musi | Do zrobienia |
 | A5 | `ConnectionProvider` i `useConnection` | A | A3, A4 | Musi | Do zrobienia |
@@ -266,7 +266,7 @@ useProfiles(): { profiles: Profile[]; activeProfile: Profile | null;
    - format `led`: tekst `"#RRGGBB"`, 7 kolorów z makiet: `#639922`, `#2FC6DE`, `#F0B429`, `#FF4438`, `#C0308A`, `#7A3CE8`, `#F2F3F4`;
    - `d1` / `d2`: `-1` = nic w zasięgu, `null` = błąd czujnika — czy firmware umie wysłać `null`;
    - `cfg` z częścią pól zmienia tylko przysłane pola (aplikacja po połączeniu i tak wysyła wszystkie pola — sekcja 7);
-   - `ping` co ok. 0,5 s na każdym ekranie to także znak obecności aplikacji: firmware gasi taśmę po zamknięciu WebSocketa albo po ok. 2 s bez żadnej wiadomości (sekcje 6 i 9);
+   - `ping` co ok. 0,5 s na każdym ekranie to także znak obecności aplikacji: firmware po ok. 2 s bez żadnej wiadomości zamyka WebSocket, a po zamknięciu połączenia gasi taśmę (sekcje 6 i 9);
    - drugi klient WebSocket (np. po wznowieniu połączenia) — propozycja: nowe połączenie zastępuje stare;
    - `act horn` zawsze bez numeru — gra dźwięk z `cfg.horn`, także przy TEST HORN (wybór dźwięku zapisuje się i wysyła od razu, sekcja 9);
    - **skręt stopniowy:** `s` w `drv` to liczba całkowita −100…100; firmware przelicza ją liniowo na 1250…1750 µs (`1500 + s × 2,5`) i obcina wartości spoza zakresu; kierunkowskaz włącza się przy \|s\| ≥ ok. 30 i gaśnie poniżej ok. 20 (sekcje 4, 9 i 12).
@@ -384,83 +384,14 @@ useProfiles(): { profiles: Profile[]; activeProfile: Profile | null;
 **Po co:** firmware ma dziś tylko program testowy. Symulator mówi tym samym protokołem co ESP32, więc całą aplikację da się zbudować i przetestować bez auta, włącznie z utratą połączenia. Przyda się też Wojtasowi i Wojtkowi jako wzorzec.
 
 1. Folder `tools/mock-car`, w nim `npm init -y` i `npm i ws`.
-2. Plik `server.js` — punkt wyjścia (rozbudowujcie wedle potrzeb):
-
-   ```js
-   // tools/mock-car/server.js — uruchom: node server.js
-   const { WebSocketServer } = require('ws');
-   const wss = new WebSocketServer({ port: 8080, path: '/ws' });
-   const car = { es: 0, as: 0, r: 0, led: 0, g: 0, s: 0, c: 0,
-     paused: false, pongDelay: 0, weak: false, d1Error: false };
-   let drvCount = 0, lastDrv = 0, maxGap = 0, lastMsgAt = 0;
-
-   const sendAll = (m) => wss.clients.forEach((c) => c.readyState === 1 && c.send(JSON.stringify(m)));
-   const ledOff = (why) => { if (car.led) console.log('LED OFF:', why); car.led = 0; };
-
-   wss.on('connection', (ws) => {
-     wss.clients.forEach((c) => { if (c !== ws) c.terminate(); });   // nowe połączenie zastępuje stare
-     console.log('klient połączony, klientów:', wss.clients.size);
-     ws.send(JSON.stringify({ t: 'hello', fw: 'mock-1.0' }));
-     ws.on('close', () => { if (wss.clients.size === 0) ledOff('połączenie zamknięte'); });
-     ws.on('message', (data) => {
-       lastMsgAt = Date.now();
-       let m; try { m = JSON.parse(data.toString()); } catch { return console.log('zły JSON'); }
-       if (m.t === 'drv') {
-         const now = Date.now();
-         if (lastDrv) maxGap = Math.max(maxGap, now - lastDrv);
-         lastDrv = now; drvCount++;
-         if (m.g === 0) car.as = 0;                             // g = 0 zdejmuje blokadę auto-stopu
-         car.g = car.es || (car.as && m.g > 0) ? 0 : m.g;       // E-STOP i blokada auto-stopu
-         car.s = Math.max(-100, Math.min(100, m.s));            // skręt −100…100, jak firmware
-         car.c = m.c;
-       } else if (m.t === 'ping') {
-         setTimeout(() => ws.send(JSON.stringify({ t: 'pong', id: m.id })), car.pongDelay);
-       } else {
-         if (m.t === 'act' && m.a === 'estop') car.es = m.on;
-         if (m.t === 'act' && m.a === 'led') car.led = m.on;
-         if (m.t === 'act' && m.a === 'radio') car.r = m.n;
-         console.log('<-', JSON.stringify(m));
-       }
-     });
-   });
-
-   setInterval(() => {                                        // telemetria 10 Hz
-     if (car.paused) return;
-     sendAll({ t: 'tel', d1: car.d1Error ? null : 40 + Math.round(Math.random() * 100),
-       d2: Math.random() < 0.5 ? -1 : 30 + Math.round(Math.random() * 50),
-       rssi: car.weak ? -80 : -50 - Math.round(Math.random() * 4), temp: 47,
-       es: car.es, as: car.as, r: car.r });
-   }, 100);
-
-   setInterval(() => {                                        // kontrola raz na sekundę
-     if (lastDrv && Date.now() - lastDrv > 300) {
-       console.log('FAILSAFE: brak drv > 300 ms → moc 0, koła prosto');
-       car.g = 0; car.s = 0; lastDrv = 0;
-     }
-     if (lastMsgAt && Date.now() - lastMsgAt > 2000) ledOff('brak wiadomości > 2 s');
-     if (drvCount) {
-       console.log(`drv ${drvCount}/s, max przerwa ${maxGap} ms, g=${car.g} s=${car.s} c=${car.c}`);
-     }
-     drvCount = 0; maxGap = 0;
-   }, 1000);
-
-   process.stdin.setRawMode(true); process.stdin.resume(); process.stdin.setEncoding('utf8');
-   process.stdin.on('data', (k) => {                          // klawisze scenariuszy testowych
-     if (k === 'p') car.paused = !car.paused;
-     if (k === 'k') wss.clients.forEach((c) => c.terminate());
-     if (k === 'l') car.pongDelay = car.pongDelay ? 0 : 120;
-     if (k === 'w') car.weak = !car.weak;
-     if (k === 'e') car.d1Error = !car.d1Error;
-     if (k === 'a' && car.c) { car.as = 1; car.g = 0; }
-     if (k === 'r') car.r = car.r ? 0 : 3;
-     if (k === 'q' || k === '\u0003') process.exit();
-     console.log('stan:', JSON.stringify(car));
-   });
-   ```
-
-3. Klawisze: `p` pauza telemetrii (utrata łącza), `k` zerwanie połączenia, `l` opóźnienie `pong` +120 ms, `w` słaby sygnał (RSSI −80), `e` błąd przedniego czujnika, `a` auto-stop (tylko przy `c` = 1; `as` = 1 aż do ramki `drv` z `g` = 0, jak w sekcji 4), `r` radio gra / nie gra (test synchronizacji radia w A6), `q` wyjście. Opiszcie je w `tools/mock-car/README.md`.
-4. Symulator, tak jak firmware (sekcja 6), gasi podświetlenie po zamknięciu połączenia albo po 2 s bez żadnej wiadomości od aplikacji — w konsoli widać wtedy `LED OFF`.
-5. Test bez aplikacji: `npx wscat -c ws://localhost:8080/ws`, wyślij `{"t":"ping","id":1}` → ma wrócić `pong`.
+2. `tools/mock-car/server.js` (Node + `ws`, port 8080, ścieżka `/ws`) — kod jest w repo, tu tylko co robi:
+   - po połączeniu `hello`, potem `tel` co 100 ms; `pong` na `ping`;
+   - `drv`: E-STOP i blokada auto-stopu zerują moc, skręt obcięty do ±100; failsafe po 300 ms bez `drv` (moc 0, koła prosto);
+   - `act` zapisuje E-STOP, LED i radio; `act` i `cfg` wypisuje w konsoli, `drv` tylko jako statystykę co sekundę (liczba ramek i najdłuższa przerwa);
+   - nowe połączenie zastępuje stare (`zamykam poprzednie połączenie` w konsoli).
+3. Klawisze: `p` pauza telemetrii (utrata łącza), `k` zerwanie połączenia, `l` opóźnienie `pong` +120 ms, `w` słaby sygnał (RSSI −80), `e` błąd przedniego czujnika, `a` auto-stop (tylko przy `c` = 1; `as` = 1 aż do ramki `drv` z `g` = 0, jak w sekcji 4), `r` radio gra / nie gra (test synchronizacji radia w A6), `q` wyjście. Opisane w `tools/mock-car/README.md`.
+4. Symulator, tak jak firmware (sekcja 6), zamyka połączenie po 2 s bez żadnej wiadomości od aplikacji (odliczanie od nawiązania połączenia), a po zamknięciu połączenia gasi podświetlenie — w konsoli widać wtedy `LED OFF`. Sprawdzane raz na sekundę, więc w symulatorze po 2–3 s; failsafe tak samo po 0,3–1,3 s.
+5. Test bez aplikacji: `npx wscat -c ws://localhost:8080/ws`, wklej w ciągu 2 s `{"t":"ping","id":1}` → ma wrócić `pong`. Bez kolejnych wiadomości symulator po 2–3 s zamyka połączenie — tak ma być.
 
 **Gotowe, gdy:**
 
@@ -490,7 +421,7 @@ useProfiles(): { profiles: Profile[]; activeProfile: Profile | null;
 - [ ] start aplikacji przy działającym symulatorze → `online` w mniej niż 2 s
 - [ ] klawisz `k` → aplikacja łączy się ponownie w ok. 1–2 s
 - [ ] symulator zatrzymany (Ctrl+C) → `offline` po 2 s, próby co 1 s bez zalewania logów; ponowny start symulatora → `online` samo
-- [ ] po kilku Fast Refresh symulator pokazuje 1 klienta
+- [ ] po kilku Fast Refresh w konsoli symulatora nie pojawia się `zamykam poprzednie połączenie` (aplikacja nie otwiera drugiego połączenia)
 - [ ] aplikacja w tle → `FAILSAFE` i `LED OFF` w symulatorze (jeśli taśma była włączona); powrót → `online`
 
 ### A4 — Ping i wskaźnik jakości łącza
@@ -990,7 +921,7 @@ Aplikacja do końca Sprintu 1 nie potrzebuje auta, ale od Sprintu 2 każda funkc
 | 1 | protokół v1 zamrożony (W2), w tym skręt `s` −100…100 | symulator, typy, cała dalsza praca |
 | 1 | ESP32 w hotspocie ze stałym IP `172.20.10.13`, `WiFi.setSleep(false)`, serwer `/ws`: `hello`, `tel` (mogą być sztuczne wartości), `pong` | test W3, Home ONLINE/OFFLINE na prawdziwym aucie |
 | 2 | `drv`: PWM ESC i serwa — serwo proporcjonalnie do `s` (`1500 + s × 2,5` µs, obcięte do 1250…1750); failsafe 300 ms (moc 0 i koła prosto) | pierwsza jazda z aplikacji, koła w powietrzu |
-| 2 | E-STOP z zatrzaskiem i `es` w telemetrii; `act led` i gaszenie taśmy po zamknięciu połączenia albo 2 s bez wiadomości; `cfg`: `limit`, `blk`; kierunkowskazy (włączenie przy \|s\| ≥ ok. 30, wyłączenie poniżej ok. 20) i światła automatyczne | pełny ekran jazdy (Sprint 2) |
+| 2 | E-STOP z zatrzaskiem i `es` w telemetrii; `act led`, zamykanie połączenia po 2 s bez wiadomości i gaszenie taśmy po zamknięciu połączenia; `cfg`: `limit`, `blk`; kierunkowskazy (włączenie przy \|s\| ≥ ok. 30, wyłączenie poniżej ok. 20) i światła automatyczne | pełny ekran jazdy (Sprint 2) |
 | 2 | DFPlayer: `act horn` (dźwięk z `cfg.horn`), `act radio`, `r` w telemetrii, klakson w trybie advert; `cfg`: `vol`, `horn`, `led`, `bri`; zapis ustawień do NVS z opóźnieniem | klakson na ekranie jazdy, ekrany Light & sound i Radio (Sprint 2) |
 | 3 | kamera Xiao: CameraWebServer, stały IP `172.20.10.14`, `/stream` na porcie 81 | podgląd wideo, CAMERA OFF i CAMERA CONNECTION LOST (Sprint 3) |
 | 3 | czujniki ToF (`d1`, `d2`), auto-stop przy `c` = 1 i flaga `as`, pikanie przy cofaniu | tempomat z auto-stopem, statystyki sesji (Sprint 3) |
@@ -1015,6 +946,11 @@ Największe ryzyko to opóźniony firmware — dlatego symulator jest w pierwszy
 Jeśli w Sprincie 3 zabraknie czasu na całą aplikację: wymagania z sekcji 10 (sterowanie, wideo, telemetria, profile, historia sesji, dźwięk i światło) są nienaruszalne. Pierwszymi kandydatami do uproszczenia są tryb GYRO, rysunek auta na Home i dopracowanie animacji.
 
 ## Zmiany w tej wersji
+
+### 1.10 (16 XI) — A2 gotowe, połączenie zamykane po 2 s ciszy
+
+- **A2 gotowe:** `tools/mock-car/server.js` i `tools/mock-car/README.md`. Kod startowy usunięty z planu — jedyna wersja jest w repo.
+- **Martwe połączenie zamyka firmware:** po ok. 2 s bez żadnej wiadomości od aplikacji firmware zamyka WebSocket (odliczanie od nawiązania połączenia), a taśmę gasi po zamknięciu połączenia. Wcześniej po 2 s ciszy tylko gasił taśmę, a połączenie zostawało otwarte. Zmienione: W2, A2, A3 (kryterium Fast Refresh), harmonogram firmware'u; w kontekście sekcje 6, 7, 9 i 12 oraz stan prac A2 w sekcji 8.
 
 ### 1.9 (15 XI) — `app_state` z kluczem obcym
 
