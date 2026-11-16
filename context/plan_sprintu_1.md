@@ -1,6 +1,6 @@
 # WebCar — aplikacja mobilna: podział pracy i plan Sprintu 1
 
-Stan: 16 listopada 2026 · wersja dokumentu 1.10 · zgodna z kontekstem v2.26 i makietami z 3 XI (lista zmian na końcu)
+Stan: 16 listopada 2026 · wersja dokumentu 1.11 · zgodna z kontekstem v2.27 i makietami z 3 XI (lista zmian na końcu)
 
 ## W skrócie
 
@@ -18,11 +18,11 @@ Stan: 16 listopada 2026 · wersja dokumentu 1.10 · zgodna z kontekstem v2.26 i 
 
 ## Co jest w repo i co z tego wynika
 
-Projekt aplikacji istnieje (Expo SDK 58): wszystkie ekrany są zaślepkami, logiki jeszcze nie ma — aktualny stan prac jest w sekcji 8 kontekstu. Firmware ma tylko blokujący program testowy, a protokół v1.0 jest zamrożony (sekcja 9 kontekstu), ale firmware go jeszcze nie obsługuje. Dlatego aplikację trzeba na początku pisać pod symulator auta, a nie pod prawdziwe ESP32.
+Projekt aplikacji istnieje (Expo SDK 58): ekrany są jeszcze zaślepkami; gotowe są typy protokołu (A1), symulator auta (A2) i baza z profilami (B4) — aktualny stan prac jest w sekcji 8 kontekstu. Firmware ma tylko blokujący program testowy, a protokół v1.0 jest zamrożony (sekcja 9 kontekstu), ale firmware go jeszcze nie obsługuje. Dlatego aplikację trzeba na początku pisać pod symulator auta, a nie pod prawdziwe ESP32.
 
 | Plik | Zawartość | Znaczenie dla aplikacji |
 |---|---|---|
-| `context/WebCar_kontekst.md` (v2.26, 16 XI) | sprzęt, łączność (sekcja 3), zachowanie funkcji (4, 7), stack i stan prac (8), protokół (9), ekrany (11), stałe (12) | główne źródło — zadania niżej odwołują się do jego sekcji |
+| `context/WebCar_kontekst.md` (v2.27, 16 XI) | sprzęt, łączność (sekcja 3), zachowanie funkcji (4, 7), stack i stan prac (8), protokół (9), ekrany (11), stałe (12) | główne źródło — zadania niżej odwołują się do jego sekcji |
 | `context/WebCar_-_all_screens.html` | makiety 25 stanów ekranów (01–19, w tym 05A) | kolory, czcionki, teksty, układ; przy różnicy wygrywa opis z kontekstu |
 | `context/plan_sprintu_1.md` | ten plik: podział pracy, harmonogram, zadania Sprintu 1 | każde zadanie to jedno issue na GitHubie z tym samym ID |
 | `README.md` | uruchomienie projektu, komendy, struktura, decyzje (np. kursywa przez `skewX`) | pierwsze kroki po `git clone` |
@@ -68,7 +68,7 @@ W tej aplikacji nie ma serwera. „Backend” to warstwa logiki w telefonie: Web
 |---|---|---|
 | Łączność: WebSocket, ping | A → B: status i kreski łącza | Motyw, czcionki, komponenty |
 | Wskaźnik jakości łącza, synchronizacja | B → A: aktywny profil (cfg) | Nawigacja, Home, Menu |
-| Symulator auta (Node) | B → A: `send()`, `setLed()`, sync | SQLite: profile i sesje |
+| Symulator auta (Node) | A → B: `send()`, `setLed()`, sync | SQLite: profile i sesje |
 | Ekran jazdy 01–07 | A → B: zapisane sesje jazdy | Profile, Drive settings (autozapis) |
 | Sesje i statystyki | | Light & sound, Radio, Telemetry |
 
@@ -661,7 +661,7 @@ useProfiles(): { profiles: Profile[]; activeProfile: Profile | null;
 
 **B · zależy od: W1**
 
-**Po co:** wszystkie kolory, czcionki i odstępy w jednym pliku. Wartości poniżej pochodzą z aktualnego kodu makiet (`WebCar - all screens.html`); sprawdźcie je w Chrome (DevTools → Inspect) przy pierwszych ekranach.
+**Po co:** wszystkie kolory, czcionki i odstępy w jednym pliku. Wartości poniżej pochodzą z aktualnego kodu makiet (`context/WebCar_-_all_screens.html`); sprawdźcie je w Chrome (DevTools → Inspect) przy pierwszych ekranach.
 
 ```ts
 export const colors = {
@@ -946,6 +946,12 @@ Największe ryzyko to opóźniony firmware — dlatego symulator jest w pierwszy
 Jeśli w Sprincie 3 zabraknie czasu na całą aplikację: wymagania z sekcji 10 (sterowanie, wideo, telemetria, profile, historia sesji, dźwięk i światło) są nienaruszalne. Pierwszymi kandydatami do uproszczenia są tryb GYRO, rysunek auta na Home i dopracowanie animacji.
 
 ## Zmiany w tej wersji
+
+### 1.11 (16 XI) — poprawki spójności
+
+- **„Co jest w repo”:** opis stanu projektu uwzględnia gotowe A1, A2 i B4 (było: „logiki jeszcze nie ma”).
+- **B2:** poprawna ścieżka makiet `context/WebCar_-_all_screens.html`.
+- **Kontrakt (4 punkty styku):** `send()`, `setLed()` i sync jako „A → B” (było „B → A”) — strzałka wszędzie oznacza „kto komu udostępnia”.
 
 ### 1.10 (16 XI) — A2 gotowe, połączenie zamykane po 2 s ciszy
 

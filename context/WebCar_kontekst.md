@@ -1,6 +1,6 @@
 # WebCar — kontekst projektu
 
-Stan: 16 listopada 2026 · wersja dokumentu 2.26
+Stan: 16 listopada 2026 · wersja dokumentu 2.27
 
 ## 0. Jak korzystać z tego dokumentu
 
@@ -35,7 +35,7 @@ Praca inżynierska na studiach informatycznych, zespół czteroosobowy (Piotrek,
 
 Cel: zdalnie sterowany model samochodu z rozbudowaną elektroniką, sterowany z aplikacji na iPhonie przez WiFi, z podglądem wideo i telemetrią.
 
-Etap: sprzęt w trakcie montażu i testów podzespołów; schemat płytki głównej gotowy; działa blokujący program testowy (sekcja 6). Projekt aplikacji założony (Expo SDK 58): wszystkie ekrany istnieją jako zaślepki, logika jeszcze nie — stan prac w sekcji 8. Istnieją makiety ekranów (sekcja 11).
+Etap: sprzęt w trakcie montażu i testów podzespołów; schemat płytki głównej gotowy; działa blokujący program testowy (start/stop przyciskiem BOOT, sekcja 2), a docelowy firmware jest do zrobienia (sekcja 6). Projekt aplikacji założony (Expo SDK 58): ekrany są jeszcze zaślepkami; gotowe są typy protokołu, baza SQLite z profilami i symulator auta — stan prac w sekcji 8. Istnieją makiety ekranów (sekcja 11).
 
 ## 2. Platforma sprzętowa
 

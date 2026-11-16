@@ -18,7 +18,7 @@ import { colors } from '@/theme';
 SplashScreen.preventAutoHideAsync();
 
 export default function RootLayout() {
-  const [loaded] = useFonts({
+  const [loaded, error] = useFonts({
     SairaCondensed_700Bold,
     JetBrainsMono_500Medium,
     JetBrainsMono_700Bold,
@@ -29,12 +29,12 @@ export default function RootLayout() {
   }, []);
 
   useEffect(() => {
-    if (loaded) {
+    if (loaded || error) {
       SplashScreen.hideAsync();
     }
-  }, [loaded]);
+  }, [loaded, error]);
 
-  if (!loaded) {
+  if (!loaded && !error) {
     return null;
   }
 
