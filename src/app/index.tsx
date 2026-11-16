@@ -1,18 +1,19 @@
-import { ScreenStub } from '@/components/ScreenStub';
-import { colors } from '@/theme';
-import { Link } from 'expo-router';
+import { Link, type Href } from 'expo-router';
 import { StyleSheet, Text } from 'react-native';
 
-const SCREENS = [
+import { ScreenStub } from '@/components/ScreenStub';
+import { colors } from '@/theme';
+
+const SCREENS: { href: Href; label: string }[] = [
   { href: '/drive', label: 'DRIVE' },
   { href: '/dev', label: 'DEV' },
-] as const;
+];
 
 export default function HomeScreen() {
   return (
     <ScreenStub title="WEBCAR" mockup="08, 08A" owner="B">
       {SCREENS.map((s) => (
-        <Link key={s.href} href={s.href} style={styles.link}>
+        <Link key={s.label} href={s.href} style={styles.link}>
           {s.label} ›
         </Link>
       ))}
