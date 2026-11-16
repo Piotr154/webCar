@@ -1,6 +1,6 @@
 # WebCar — kontekst projektu
 
-Stan: 15 listopada 2026 · wersja dokumentu 2.25
+Stan: 16 listopada 2026 · wersja dokumentu 2.26
 
 ## 0. Jak korzystać z tego dokumentu
 
@@ -318,7 +318,8 @@ Pojazd nie ma: czujnika prędkości ani obrotów, IMU/żyroskopu, pomiaru napię
 - kierunkowskazy automatyczne: miganie (GPIO15/16) po stronie skrętu z `drv.s` (włączenie przy |`s`| ≥ ok. 30, wyłączenie poniżej ok. 20), gdy włączone w `cfg.blk`
 - serwo skrętu: `s` −100…100 przeliczane liniowo na 1250…1750 µs (`1500 + s × 2,5`)
 - włączanie/wyłączanie podświetlenia na polecenie aplikacji
-- gaszenie podświetlenia po utracie połączenia z aplikacją: zamknięcie połączenia WebSocket albo brak jakiejkolwiek wiadomości od aplikacji przez ok. 2 s (aplikacja wysyła `ping` co ok. 0,5 s na każdym ekranie, sekcja 9)
+- zamykanie martwego połączenia: brak jakiejkolwiek wiadomości od aplikacji przez ok. 2 s → firmware sam zamyka połączenie WebSocket (aplikacja wysyła `ping` co ok. 0,5 s na każdym ekranie, sekcja 9). Odliczanie zaczyna się od nawiązania połączenia — samo połączenie liczy się jak wiadomość, inaczej nowy klient mógłby zostać rozłączony, zanim cokolwiek wyśle
+- gaszenie podświetlenia po zamknięciu połączenia WebSocket (przez aplikację, przez zerwanie albo przez firmware po 2 s ciszy)
 - ograniczenie maksymalnej jasności taśmy WS2813
 - obsługa DFPlayera: foldery, advert dla klaksonu przy grającym radiu, stan odtwarzania przez UART, wysyłany w telemetrii (pole `r`, sekcja 9)
 - zapis ustawień do NVS z opóźnieniem po ostatniej zmianie
@@ -384,7 +385,7 @@ Profil obejmuje wszystko z ekranów Drive settings, Light & sound i Radio:
 
 ### Sesja jazdy
 
-Sesja trwa od wejścia na ekran jazdy (przyciskiem DRIVE na ekranie Home) do wyjścia z niego — przez menu do innego ekranu albo przyciskiem QUIT w okienku CONNECTION LOST (sekcja 3). Samo otwarcie menu i powrót przyciskiem BACK TO DRIVING nie kończą sesji (otwarcie menu zeruje moc, prostuje koła i wyłącza tempomat — sekcja 4). Utrata i odzyskanie połączenia też nie kończą sesji — czas liczy się dalej, a w czasie przerwy po prostu nie ma nowych pomiarów do statystyk. Przy końcu sesji aplikacja wysyła moc 0 i skręt 0 (koła prosto, więc kierunkowskazy gasną), wyłącza tempomat i podświetlenie (`act led` z `on` = 0), a dopiero potem przestaje wysyłać ramki `drv` — nie polega wyłącznie na failsafe. **Wyjątek: QUIT w okienku CONNECTION LOST** — wtedy nie ma połączenia, więc aplikacja niczego nie wysyła. Nie jest to potrzebne: okienko pojawia się po ok. 2 s bez telemetrii, a failsafe zatrzymał auto i wyprostował koła już po ok. 300 ms bez `drv`; taśmę gasi firmware po ok. 2 s bez wiadomości od aplikacji (sekcja 6). Gdy łącze wróci, a użytkownik jest już na Home, synchronizacja i tak wyśle podświetlenie wyłączone (wyżej). Dla każdej sesji aplikacja zapisuje:
+Sesja trwa od wejścia na ekran jazdy (przyciskiem DRIVE na ekranie Home) do wyjścia z niego — przez menu do innego ekranu albo przyciskiem QUIT w okienku CONNECTION LOST (sekcja 3). Samo otwarcie menu i powrót przyciskiem BACK TO DRIVING nie kończą sesji (otwarcie menu zeruje moc, prostuje koła i wyłącza tempomat — sekcja 4). Utrata i odzyskanie połączenia też nie kończą sesji — czas liczy się dalej, a w czasie przerwy po prostu nie ma nowych pomiarów do statystyk. Przy końcu sesji aplikacja wysyła moc 0 i skręt 0 (koła prosto, więc kierunkowskazy gasną), wyłącza tempomat i podświetlenie (`act led` z `on` = 0), a dopiero potem przestaje wysyłać ramki `drv` — nie polega wyłącznie na failsafe. **Wyjątek: QUIT w okienku CONNECTION LOST** — wtedy nie ma połączenia, więc aplikacja niczego nie wysyła. Nie jest to potrzebne: okienko pojawia się po ok. 2 s bez telemetrii, a failsafe zatrzymał auto i wyprostował koła już po ok. 300 ms bez `drv`; firmware po ok. 2 s bez wiadomości od aplikacji zamyka połączenie i gasi taśmę (sekcja 6). Gdy łącze wróci, a użytkownik jest już na Home, synchronizacja i tak wyśle podświetlenie wyłączone (wyżej). Dla każdej sesji aplikacja zapisuje:
 
 - datę, nazwę kierowcy, czas trwania;
 - najmniejszą odległość z przodu i z tyłu;
@@ -442,7 +443,8 @@ Zadania i ich opis: plan Sprintu 1 (`context/plan_sprintu_1.md`). A = Piotrek (j
 | W2 | Protokół v1 z Wojtasem i Wojtkiem | A+B | gotowe — protokół v1.0 zamrożony, potwierdzony przez Wojtasa i Wojtka (sekcja 9) |
 | W3 | Test hotspot + ESP32 + aplikacja | A+B | czeka na firmware |
 | A1 | Typy protokołu i `config.ts` | A | gotowe: `src/connection/protocol.ts` (typy wiadomości z sekcji 9, `parseCarMessage` sprawdza tylko pole `t`), `src/config.ts` (adresy i stałe z sekcji 12; IP symulatora z `Constants.expoConfig.hostUri`) |
-| A2–A8 | symulator, łączność, ping, provider, sync, prototyp jazdy, testy | A | nierozpoczęte |
+| A2 | Symulator auta | A | gotowe: `tools/mock-car/server.js` (Node + `ws`, port 8080, `/ws`): `hello`, `tel` 10 Hz, `pong`, E-STOP i blokada auto-stopu w `drv`, failsafe 300 ms, nowe połączenie zastępuje stare, zamknięcie połączenia po 2 s bez wiadomości i `LED OFF` po zamknięciu; klawisze scenariuszy testowych w `tools/mock-car/README.md` |
+| A3–A8 | łączność, ping, provider, sync, prototyp jazdy, testy | A | nierozpoczęte |
 | B1 | Czcionki i test kursywy | B | scalone do `main` (PR #3): ładowanie czcionek, test na iPhonie (kursywa przez `skewX`), `Typography.tsx`; ekran `/dev` pokazuje `Heading`, `Label` i `Mono` |
 | B2 | Motyw `theme.ts` | B | scalone do `main` (PR #2): `src/theme.ts`, ekrany i `ScreenStub` używają `colors.*` i `space.*` |
 | B3 | Nawigacja i ekrany-zaślepki | B | gotowe: `_layout.tsx` ze `Stack`, `GestureHandlerRootView`, `StatusBar` i blokadą pionu (`PORTRAIT_UP` przy starcie); `menu` jako `transparentModal` + `fade` z przezroczystym tłem, `drive` z `gestureEnabled: false`; płytki stos przez `navigateFromMenu(href)` w `src/navigation.ts` (`dismissAll` + `push`, stos zawsze Home → wybrany ekran). Tymczasowo: zaślepka menu z listą `MENU_ITEMS` (`src/app/menu.tsx`, 6 pozycji — do użycia w menu na ekranie jazdy, 07), w `ScreenStub` napis MENU obok tytułu i „‹ WSTECZ” (przez `useCanGoBack()`); Home ma już tylko linki DRIVE i DEV. Przycisk MENU i menu z makiety 09 powstaną w B6/B7. Uwaga: w SDK 58 nie ma paczki `@react-navigation/native` — hooki nawigacji (`useCanGoBack`, `useNavigation`) importujemy z `expo-router` |
@@ -473,7 +475,7 @@ Konwencje: moc dodatnia = do przodu, ujemna = do tyłu; skręt `-100` = pełny w
 | `{"t":"act","a":"estop","on":1}` | włącza E-STOP (zatrzask w firmware); `"on":0` zwalnia. Dopóki jest włączony, firmware ignoruje moc z `drv` |
 | `{"t":"act","a":"radio","n":2}` | odtwarzaj utwór nr 2; `"n":0` zatrzymuje |
 | `{"t":"cfg","limit":45,"stop":20,"blk":1,"led":"#639922","bri":60,"vol":22,"horn":3}` | ustawienia aktywnego profilu, zapisywane w NVS; można wysłać tylko część pól — firmware zmienia tylko przysłane pola (po połączeniu aplikacja i tak wysyła wszystkie, sekcja 7). `limit` %, `stop` cm (próg auto-stopu), `blk` = 1 gdy kierunkowskazy automatyczne włączone, `led` kolor jako tekst `"#RRGGBB"`, jeden z 7: `#639922`, `#2FC6DE`, `#F0B429`, `#FF4438`, `#C0308A`, `#7A3CE8`, `#F2F3F4`, `bri` %, `vol` 0–30, `horn` 1–6 |
-| `{"t":"ping","id":17}` | pomiar opóźnienia, co ok. 0,5 s na każdym ekranie, gdy jest połączenie (na ekranach postoju to jedyna wiadomość od aplikacji, a przy limicie 2 s jeden spóźniony ping nie zgasi taśmy); firmware traktuje go też jako znak, że aplikacja jest połączona (gaszenie podświetlenia, sekcja 6) |
+| `{"t":"ping","id":17}` | pomiar opóźnienia, co ok. 0,5 s na każdym ekranie, gdy jest połączenie (na ekranach postoju to jedyna wiadomość od aplikacji, a przy limicie 2 s jeden spóźniony ping nie zerwie połączenia); firmware traktuje go też jako znak, że aplikacja jest połączona (zamykanie połączenia po 2 s ciszy, sekcja 6) |
 
 Tryb skrętu (STICK/GYRO) i model pedałów działają wyłącznie w aplikacji — pojazd dostaje tylko wynik w ramce `drv`.
 
@@ -566,7 +568,7 @@ Wszystkie poniższe to stałe w kodzie — nie ma ich w ustawieniach aplikacji. 
 | pikanie przy cofaniu: początek / ciągły dźwięk | firmware | od ok. 30 cm / poniżej ok. 10 cm |
 | maksymalna jasność taśmy WS2813 (= 100 % w aplikacji) | firmware | ok. 40–60 % pełnej mocy |
 | brak telemetrii do pokazania CONNECTION LOST | aplikacja | ok. 2 s |
-| brak wiadomości od aplikacji do zgaszenia podświetlenia | firmware | ok. 2 s |
+| brak wiadomości od aplikacji do zamknięcia połączenia (i zgaszenia podświetlenia) | firmware | ok. 2 s |
 | odstęp między pingami (każdy ekran) | aplikacja | ok. 0,5 s |
 | ponowna próba otwarcia strumienia, gdy nie działa | aplikacja | co ok. 3 s |
 | wskaźnik jakości łącza: progi dla 4 / 3 / 2 kresek (poniżej — 1 kreska) | aplikacja | RSSI ≥ −55 / −65 / −75 dBm i ping (średnia z 3) ≤ 30 / 50 / 100 ms; 1 kreska także przy > 0,5 s bez telemetrii |
