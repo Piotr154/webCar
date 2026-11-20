@@ -1,6 +1,6 @@
 # WebCar — kontekst projektu
 
-Stan: 16 listopada 2026 · wersja dokumentu 2.27
+Stan: 20 listopada 2026 · wersja dokumentu 2.28
 
 ## 0. Jak korzystać z tego dokumentu
 
@@ -35,7 +35,7 @@ Praca inżynierska na studiach informatycznych, zespół czteroosobowy (Piotrek,
 
 Cel: zdalnie sterowany model samochodu z rozbudowaną elektroniką, sterowany z aplikacji na iPhonie przez WiFi, z podglądem wideo i telemetrią.
 
-Etap: sprzęt w trakcie montażu i testów podzespołów; schemat płytki głównej gotowy; działa blokujący program testowy (start/stop przyciskiem BOOT, sekcja 2), a docelowy firmware jest do zrobienia (sekcja 6). Projekt aplikacji założony (Expo SDK 58): ekrany są jeszcze zaślepkami; gotowe są typy protokołu, baza SQLite z profilami i symulator auta — stan prac w sekcji 8. Istnieją makiety ekranów (sekcja 11).
+Etap: sprzęt w trakcie montażu i testów podzespołów; schemat płytki głównej gotowy; działa blokujący program testowy (start/stop przyciskiem BOOT, sekcja 2), a docelowy firmware jest do zrobienia (sekcja 6). Projekt aplikacji założony (Expo SDK 58): ekrany są jeszcze zaślepkami; gotowe są typy protokołu, baza SQLite z profilami (z `useProfiles()` dla ekranów) i symulator auta — stan prac w sekcji 8. Istnieją makiety ekranów (sekcja 11).
 
 ## 2. Platforma sprzętowa
 
@@ -449,7 +449,7 @@ Zadania i ich opis: plan Sprintu 1 (`context/plan_sprintu_1.md`). A = Piotrek (j
 | B2 | Motyw `theme.ts` | B | scalone do `main` (PR #2): `src/theme.ts`, ekrany i `ScreenStub` używają `colors.*` i `space.*` |
 | B3 | Nawigacja i ekrany-zaślepki | B | gotowe: `_layout.tsx` ze `Stack`, `GestureHandlerRootView`, `StatusBar` i blokadą pionu (`PORTRAIT_UP` przy starcie); `menu` jako `transparentModal` + `fade` z przezroczystym tłem, `drive` z `gestureEnabled: false`; płytki stos przez `navigateFromMenu(href)` w `src/navigation.ts` (`dismissAll` + `push`, stos zawsze Home → wybrany ekran). Tymczasowo: zaślepka menu z listą `MENU_ITEMS` (`src/app/menu.tsx`, 6 pozycji — do użycia w menu na ekranie jazdy, 07), w `ScreenStub` napis MENU obok tytułu i „‹ WSTECZ” (przez `useCanGoBack()`); Home ma już tylko linki DRIVE i DEV. Przycisk MENU i menu z makiety 09 powstaną w B6/B7. Uwaga: w SDK 58 nie ma paczki `@react-navigation/native` — hooki nawigacji (`useCanGoBack`, `useNavigation`) importujemy z `expo-router` |
 | B4 | SQLite i repozytorium profili | B | gotowe: `src/db/db.ts` (`getDb()` — jedyne miejsce otwierania bazy, włącza `PRAGMA foreign_keys = ON`; schemat v1 z tabelami `profiles`, `app_state` (jeden wiersz `id = 1`, `active_profile_id` z kluczem obcym do `profiles`), `sessions`, migracja przez `PRAGMA user_version`, profil startowy `DRIVER`, `resetDb()`), `src/db/profiles.ts` (typ `Profile` z kontraktu, `getProfiles`, `getProfile`, `getActiveProfile`, `setActiveProfile`, `createProfile`, `renameProfile`, `updateProfile`, `deleteProfile` — rzuca błąd dla aktywnego, `normalizeName`, `isNameValid`, `MAX_NAME_LENGTH` = 12). Piotrek może używać `getActiveProfile()` w A6 |
-| B5 | `ProfileProvider` i `useProfiles` | B | do zrobienia |
+| B5 | `ProfileProvider` i `useProfiles` | B | gotowe: `src/state/ProfileContext.tsx` — `ProfileProvider` (w `_layout.tsx`, wewnątrz `GestureHandlerRootView`) przy starcie wczytuje `profiles` i `activeProfile`; `useProfiles()` zwraca je razem z akcjami `activate`, `create`, `rename`, `remove`, `update` — każda zapisuje w bazie, a potem przeładowuje stan; błędy (np. usuwanie aktywnego profilu, powtórzona nazwa) trafiają do ekranu, który wywołał akcję. Dwa `TODO(A6)` czekają na `syncActiveProfile()`: po `activate` i po `update` aktywnego profilu. Tymczasowo: Home pokazuje `DRIVER: <nazwa>`, a `/dev` ma sekcję „Profile (test B5)” (dodawanie i aktywacja profili) |
 | B6 | Komponenty bazowe | B | do zrobienia |
 | B7 | Ekran Menu (09) | B | do zrobienia |
 | B8 | Ekran Home (08, 08A) | B | do zrobienia |
