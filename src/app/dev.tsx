@@ -1,10 +1,12 @@
-import { StyleSheet } from 'react-native';
+import { Heading, Label, Mono } from '@/components/Typography';
+import { useProfiles } from '@/state/ProfileContext';
+import { colors, space } from '@/theme';
+import { Pressable, StyleSheet } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 
-import { Heading, Label, Mono } from '@/components/Typography';
-import { colors, space } from '@/theme';
-
 export default function DevScreen() {
+  const { profiles, activeProfile, activate, create } = useProfiles();
+
   return (
     <SafeAreaView style={styles.container}>
       <Label style={styles.gap}>Heading 88</Label>
@@ -19,6 +21,18 @@ export default function DevScreen() {
       <Label>Hello Karol</Label>
       <Label style={styles.gap}>Mono</Label>
       <Mono>24 MS · 04:12</Mono>
+      <Label style={styles.gap}>Profile (test B5)</Label>
+      <Pressable onPress={() => create(`TEST${profiles.length}`)}>
+        <Mono>+ DODAJ PROFIL</Mono>
+      </Pressable>
+      {profiles.map((p) => (
+        <Pressable key={p.id} onPress={() => activate(p.id)}>
+          <Mono>
+            {p.id === activeProfile?.id ? '● ' : '○ '}
+            {p.name}
+          </Mono>
+        </Pressable>
+      ))}
     </SafeAreaView>
   );
 }
