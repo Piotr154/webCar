@@ -13,6 +13,7 @@ import { StatusBar } from 'expo-status-bar';
 import { useEffect } from 'react';
 import { GestureHandlerRootView } from 'react-native-gesture-handler';
 
+import { ProfileProvider } from '@/state/ProfileContext';
 import { colors } from '@/theme';
 
 SplashScreen.preventAutoHideAsync();
@@ -40,23 +41,25 @@ export default function RootLayout() {
 
   return (
     <GestureHandlerRootView style={{ flex: 1 }}>
-      <StatusBar style="light" />
-      <Stack
-        screenOptions={{
-          headerShown: false,
-          contentStyle: { backgroundColor: colors.background },
-        }}
-      >
-        <Stack.Screen
-          name="menu"
-          options={{
-            presentation: 'transparentModal',
-            animation: 'fade',
-            contentStyle: { backgroundColor: 'transparent' },
+      <ProfileProvider>
+        <StatusBar style="light" />
+        <Stack
+          screenOptions={{
+            headerShown: false,
+            contentStyle: { backgroundColor: colors.background },
           }}
-        />
-        <Stack.Screen name="drive" options={{ gestureEnabled: false }} />
-      </Stack>
+        >
+          <Stack.Screen
+            name="menu"
+            options={{
+              presentation: 'transparentModal',
+              animation: 'fade',
+              contentStyle: { backgroundColor: 'transparent' },
+            }}
+          />
+          <Stack.Screen name="drive" options={{ gestureEnabled: false }} />
+        </Stack>
+      </ProfileProvider>
     </GestureHandlerRootView>
   );
 }

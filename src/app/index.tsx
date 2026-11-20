@@ -2,6 +2,7 @@ import { Link, type Href } from 'expo-router';
 import { StyleSheet, Text } from 'react-native';
 
 import { ScreenStub } from '@/components/ScreenStub';
+import { useProfiles } from '@/state/ProfileContext';
 import { colors } from '@/theme';
 
 const SCREENS: { href: Href; label: string }[] = [
@@ -10,8 +11,11 @@ const SCREENS: { href: Href; label: string }[] = [
 ];
 
 export default function HomeScreen() {
+  const { activeProfile } = useProfiles();
+
   return (
     <ScreenStub title="WEBCAR" mockup="08, 08A" owner="B">
+      <Text style={styles.link}>DRIVER: {activeProfile?.name ?? '—'}</Text>
       {SCREENS.map((s) => (
         <Link key={s.label} href={s.href} style={styles.link}>
           {s.label} ›
