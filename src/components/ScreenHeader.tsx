@@ -1,9 +1,7 @@
-import { usePathname } from 'expo-router';
 import { StyleSheet, View } from 'react-native';
 
 import { MenuButton } from '@/components/MenuButton';
 import { Heading, Label } from '@/components/Typography';
-import { openMenu } from '@/navigation';
 import { colors, space } from '@/theme';
 
 type Props = {
@@ -11,8 +9,6 @@ type Props = {
 };
 
 export function ScreenHeader({ title }: Props) {
-  const pathname = usePathname();
-
   return (
     <View style={styles.row}>
       <View style={styles.bar} />
@@ -22,7 +18,7 @@ export function ScreenHeader({ title }: Props) {
         </Label>
         <Heading>{title}</Heading>
       </View>
-      <MenuButton onPress={() => openMenu(pathname)} />
+      <MenuButton />
     </View>
   );
 }

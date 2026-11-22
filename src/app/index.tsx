@@ -4,7 +4,6 @@ import { MenuButton } from '@/components/MenuButton';
 import { PrimaryButton } from '@/components/PrimaryButton';
 import { SignalBars } from '@/components/SignalBars';
 import { Heading, Label } from '@/components/Typography';
-import { openMenu } from '@/navigation';
 import { useProfiles } from '@/state/ProfileContext';
 import { colors, space } from '@/theme';
 import { router } from 'expo-router';
@@ -26,7 +25,7 @@ export default function HomeScreen() {
         <Label size={16} color={colors.muted2} style={styles.hello}>
           Hello {activeProfile?.name ?? ''}
         </Label>
-        <MenuButton onPress={() => openMenu('/')} />
+        <MenuButton />
       </View>
 
       {/* Przytrzymanie WEBCAR otwiera /dev — tylko podczas pracy z Metro (__DEV__). */}

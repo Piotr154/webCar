@@ -1,15 +1,16 @@
+import { usePathname } from 'expo-router';
 import { Pressable, StyleSheet, View } from 'react-native';
 
+import { openMenu } from '@/navigation';
 import { colors } from '@/theme';
 
-type Props = {
-  onPress: () => void;
-};
+// Otwiera menu (09) i podaje mu ścieżkę bieżącego ekranu.
+export function MenuButton() {
+  const pathname = usePathname();
 
-export function MenuButton({ onPress }: Props) {
   return (
     <Pressable
-      onPress={onPress}
+      onPress={() => openMenu(pathname)}
       hitSlop={8}
       accessibilityRole="button"
       accessibilityLabel="Menu"
