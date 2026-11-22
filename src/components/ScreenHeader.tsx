@@ -1,0 +1,46 @@
+import { router } from 'expo-router';
+import { StyleSheet, View } from 'react-native';
+
+import { MenuButton } from '@/components/MenuButton';
+import { Heading, Label } from '@/components/Typography';
+import { colors, space } from '@/theme';
+
+type Props = {
+  title: string;
+};
+
+export function ScreenHeader({ title }: Props) {
+  return (
+    <View style={styles.row}>
+      <View style={styles.bar} />
+      <View style={styles.texts}>
+        <Label color={colors.accent} style={styles.brand}>
+          WebCar
+        </Label>
+        {/* Bez lineHeight: przy lineHeight = fontSize iOS ucina litery Saira Condensed.
+            Naturalny wiersz jest wyższy i sam daje odstęp pod „WEBCAR”, więc bez marginTop. */}
+        <Heading>{title}</Heading>
+      </View>
+      <MenuButton onPress={() => router.push('/menu')} />
+    </View>
+  );
+}
+
+const styles = StyleSheet.create({
+  row: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: space.m,
+    paddingTop: space.xl,
+    paddingHorizontal: space.l,
+    paddingBottom: space.l,
+  },
+  bar: {
+    width: 6,
+    height: 46,
+    backgroundColor: colors.accent,
+    transform: [{ skewX: '-12deg' }],
+  },
+  texts: { flex: 1 },
+  brand: { letterSpacing: 2.4, lineHeight: 12 },
+});

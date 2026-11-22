@@ -1,4 +1,5 @@
-import { MenuButton } from '@/components/MenuButton';
+import { ScreenHeader } from '@/components/ScreenHeader';
+
 import { Heading, Label, Mono } from '@/components/Typography';
 import { resetDb } from '@/db/db';
 import { useProfiles } from '@/state/ProfileContext';
@@ -11,8 +12,9 @@ export default function DevScreen() {
 
   return (
     <SafeAreaView style={styles.container}>
-      <Label>MenuButton (B6)</Label>
-      <MenuButton onPress={() => console.log('menu')} />
+      <Label>ScreenHeader (B6)</Label>
+      <ScreenHeader title="Drive settings" />
+      <ScreenHeader title="Driver profiles" />
       <Label style={styles.gap}>Heading 88</Label>
       <Heading size={88}>WebCar</Heading>
       <Label style={styles.gap}>Heading 34</Label>
