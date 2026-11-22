@@ -1,4 +1,6 @@
+import { useState } from 'react';
 import { Button } from '@/components/Button';
+import { Dialog } from '@/components/Dialog';
 import { InfoTile } from '@/components/InfoTile';
 import { PrimaryButton } from '@/components/PrimaryButton';
 import { ScreenHeader } from '@/components/ScreenHeader';
@@ -12,6 +14,7 @@ import { SafeAreaView } from 'react-native-safe-area-context';
 
 export default function DevScreen() {
   const { profiles, activeProfile, activate, create } = useProfiles();
+  const [dialog, setDialog] = useState<'delete' | 'noConnection' | null>(null);
 
   return (
     <SafeAreaView style={styles.container}>
@@ -99,6 +102,26 @@ export default function DevScreen() {
             onPress={() => console.log('test horn')}
           />
         </View>
+        <Label style={styles.gap}>Dialog (B6)</Label>
+        <View style={styles.buttonRow}>
+          <Button label="11B" onPress={() => setDialog('delete')} />
+          <Button label="19" onPress={() => setDialog('noConnection')} />
+        </View>
+        <Dialog visible={dialog === 'delete'} title="Delete Maja's profile?">
+          <Button label="Cancel" onPress={() => setDialog(null)} />
+          <Button
+            label="Delete"
+            variant="danger"
+            onPress={() => setDialog(null)}
+          />
+        </Dialog>
+        <Dialog
+          visible={dialog === 'noConnection'}
+          title="No connection"
+          marker
+        >
+          <Button label="Close" cutCorner onPress={() => setDialog(null)} />
+        </Dialog>
         <Label style={styles.gap}>Heading 88</Label>
         <Heading size={88}>WebCar</Heading>
         <Label style={styles.gap}>Heading 34</Label>
