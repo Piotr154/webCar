@@ -20,8 +20,6 @@ export function ScreenHeader({ title }: Props) {
         <Label color={colors.accent} style={styles.brand}>
           WebCar
         </Label>
-        {/* Bez lineHeight: przy lineHeight = fontSize iOS ucina litery Saira Condensed.
-            Naturalny wiersz jest wyższy i sam daje odstęp pod „WEBCAR”, więc bez marginTop. */}
         <Heading>{title}</Heading>
       </View>
       <MenuButton onPress={() => openMenu(pathname)} />
