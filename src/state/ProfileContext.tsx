@@ -27,6 +27,7 @@ type ProfileContextValue = {
   rename: (id: number, name: string) => Promise<void>;
   remove: (id: number) => Promise<void>;
   update: (id: number, changes: ProfileChanges) => Promise<void>;
+  reload: () => Promise<void>;
 };
 
 const ProfileContext = createContext<ProfileContextValue | null>(null);
@@ -100,6 +101,7 @@ export function ProfileProvider({ children }: { children: ReactNode }) {
         rename,
         remove,
         update,
+        reload,
       }}
     >
       {children}

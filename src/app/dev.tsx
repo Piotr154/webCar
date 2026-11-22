@@ -13,7 +13,7 @@ import { Pressable, ScrollView, StyleSheet, View } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 
 export default function DevScreen() {
-  const { profiles, activeProfile, activate, create } = useProfiles();
+  const { profiles, activeProfile, activate, create, reload } = useProfiles();
   const [dialog, setDialog] = useState<'delete' | 'noConnection' | null>(null);
   function activateNext() {
     if (profiles.length < 2) return;
@@ -150,9 +150,7 @@ export default function DevScreen() {
         <Pressable
           onPress={() =>
             resetDb()
-              .then(() =>
-                console.log('Baza zresetowana — przeładuj aplikację (r)'),
-              )
+              .then(reload)
               .catch((e) => console.error('Reset bazy nie udał się', e))
           }
         >
