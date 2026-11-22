@@ -1,4 +1,3 @@
-import { useState } from 'react';
 import { Button } from '@/components/Button';
 import { Dialog } from '@/components/Dialog';
 import { InfoTile } from '@/components/InfoTile';
@@ -9,6 +8,7 @@ import { Heading, Label, Mono } from '@/components/Typography';
 import { resetDb } from '@/db/db';
 import { useProfiles } from '@/state/ProfileContext';
 import { colors, space } from '@/theme';
+import { useState } from 'react';
 import { Pressable, ScrollView, StyleSheet, View } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 
@@ -52,6 +52,11 @@ export default function DevScreen() {
             <SignalBars key={level} level={level} size="large" />
           ))}
           <SignalBars level={1} size="large" color={colors.danger} />
+        </View>
+        <View style={styles.barsRow}>
+          {[0, 1, 2, 3, 4].map((level) => (
+            <SignalBars key={level} level={level} />
+          ))}
         </View>
         <Label style={styles.gap}>Button (B6)</Label>
         <View style={styles.buttonRow}>
