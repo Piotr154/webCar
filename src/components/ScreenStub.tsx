@@ -1,8 +1,10 @@
-import { router, useCanGoBack } from 'expo-router';
+import { router, useCanGoBack, usePathname } from 'expo-router';
 import type { ReactNode } from 'react';
 import { Pressable, StyleSheet, Text, View } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 
+import { MenuButton } from '@/components/MenuButton';
+import { openMenu } from '@/navigation';
 import { colors, space } from '@/theme';
 
 type Props = {
@@ -10,29 +12,19 @@ type Props = {
   mockup: string;
   owner: 'A' | 'B';
   children?: ReactNode;
-  hideMenuButton?: boolean;
 };
 
 const HIT_SLOP = 16;
 
-export function ScreenStub({
-  title,
-  mockup,
-  owner,
-  children,
-  hideMenuButton,
-}: Props) {
+export function ScreenStub({ title, mockup, owner, children }: Props) {
   const canGoBack = useCanGoBack();
+  const pathname = usePathname();
 
   return (
     <SafeAreaView style={styles.container}>
       <View style={styles.header}>
         <Text style={styles.title}>{title}</Text>
-        {!hideMenuButton && (
-          <Pressable hitSlop={HIT_SLOP} onPress={() => router.push('/menu')}>
-            <Text style={styles.menuText}>MENU ☰</Text>
-          </Pressable>
-        )}
+        <MenuButton onPress={() => openMenu(pathname)} />
       </View>
       <Text style={styles.info}>
         makieta {mockup} · moduł {owner}
@@ -61,7 +53,6 @@ const styles = StyleSheet.create({
     gap: space.m,
   },
   title: { color: colors.text, fontSize: 34, fontWeight: '700', flexShrink: 1 },
-  menuText: { color: colors.text2, fontSize: 18, fontWeight: '700' },
   info: { color: colors.muted2, fontSize: 13, marginTop: 4 },
   todo: {
     color: colors.accent,
