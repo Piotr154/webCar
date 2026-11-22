@@ -5,7 +5,6 @@ import { CutCornerView } from '@/components/CutCornerView';
 import { Heading } from '@/components/Typography';
 import { colors } from '@/theme';
 
-// Dwa rozmiary z makiet: DRIVE na Home (08) i pozostałe duże przyciski (10A, 14, 15, 17).
 const SIZES = {
   large: {
     font: 44,
