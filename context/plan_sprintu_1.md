@@ -1,6 +1,6 @@
 # WebCar — aplikacja mobilna: podział pracy i plan Sprintu 1
 
-Stan: 22 listopada 2026 · wersja dokumentu 1.14 · zgodna z kontekstem v2.30 i makietami z 3 XI (lista zmian na końcu)
+Stan: 22 listopada 2026 · wersja dokumentu 1.15 · zgodna z kontekstem v2.31 i makietami z 3 XI (lista zmian na końcu)
 
 ## W skrócie
 
@@ -18,7 +18,7 @@ Stan: 22 listopada 2026 · wersja dokumentu 1.14 · zgodna z kontekstem v2.30 i 
 
 ## Co jest w repo i co z tego wynika
 
-Projekt aplikacji istnieje (Expo SDK 58): ekrany są jeszcze zaślepkami; gotowe są typy protokołu (A1), symulator auta (A2), baza z profilami (B4, B5) i komponenty bazowe (B6) — aktualny stan prac jest w sekcji 8 kontekstu. Firmware ma tylko blokujący program testowy, a protokół v1.0 jest zamrożony (sekcja 9 kontekstu), ale firmware go jeszcze nie obsługuje. Dlatego aplikację trzeba na początku pisać pod symulator auta, a nie pod prawdziwe ESP32.
+Projekt aplikacji istnieje (Expo SDK 58): gotowe są ekrany Home (B8) i Menu (B7), pozostałe są jeszcze zaślepkami; gotowe są też typy protokołu (A1), symulator auta (A2), baza z profilami (B4, B5) i komponenty bazowe (B6) — aktualny stan prac jest w sekcji 8 kontekstu. Firmware ma tylko blokujący program testowy, a protokół v1.0 jest zamrożony (sekcja 9 kontekstu), ale firmware go jeszcze nie obsługuje. Dlatego aplikację trzeba na początku pisać pod symulator auta, a nie pod prawdziwe ESP32.
 
 | Plik | Zawartość | Znaczenie dla aplikacji |
 |---|---|---|
@@ -200,7 +200,7 @@ useProfiles(): { profiles: Profile[]; activeProfile: Profile | null;
 | B5 | `ProfileProvider` i `useProfiles` | B | B4 | Musi | Gotowe |
 | B6 | Komponenty bazowe | B | B1, B2 | Musi | Gotowe |
 | B7 | Ekran Menu (09) | B | B3, B6 | Musi | Gotowe |
-| B8 | Ekran Home (08, 08A) | B | B5, B6, A5 | Musi | Do zrobienia |
+| B8 | Ekran Home (08, 08A) | B | B5, B6, A5 | Musi | Gotowe, czeka na A5 |
 | B9 | Ekran `/dev` — katalog komponentów | B | B6 | Może poczekać | Do zrobienia |
 | W3 | Test na sprzęcie: hotspot + ESP32 + aplikacja | A+B | A3, firmware | Musi | Do zrobienia |
 | W4 | Demo, retro, plan Sprintu 2 | A+B | wszystkie | Musi | Do zrobienia |
@@ -946,6 +946,12 @@ Największe ryzyko to opóźniony firmware — dlatego symulator jest w pierwszy
 Jeśli w Sprincie 3 zabraknie czasu na całą aplikację: wymagania z sekcji 10 (sterowanie, wideo, telemetria, profile, historia sesji, dźwięk i światło) są nienaruszalne. Pierwszymi kandydatami do uproszczenia są tryb GYRO, rysunek auta na Home i dopracowanie animacji.
 
 ## Zmiany w tej wersji
+
+### 1.15 (22 XI) — B8 gotowe (bez A5)
+
+- **B8 gotowe poza podłączeniem A5:** Home jak makiety 08 i 08A. Stan połączenia jest tymczasowo stały (`offline`) z `TODO(A5)` — warunek „symulator wł./wył. → ONLINE/OFFLINE” sprawdzimy po A5, gdy blok z `TODO(A5)` zamieni się na `useConnection()`.
+- **Makieta nie mieści się 1:1 na ekranie** (844 pt bez paska stanu i paska Home): prostokąt na auto ma `flex: 1` z `maxHeight: 250`, a WEBCAR ujemny margines — reszta wymiarów jak w makiecie.
+- **Wejście na `/dev`** (punkt 3 z B9) zrobione już w B8: przytrzymanie WEBCAR, tylko gdy `__DEV__`. Linki DRIVE i DEV z B3 zniknęły z Home.
 
 ### 1.14 (22 XI) — B7 gotowe
 
