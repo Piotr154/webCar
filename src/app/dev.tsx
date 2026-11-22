@@ -15,7 +15,14 @@ import { SafeAreaView } from 'react-native-safe-area-context';
 export default function DevScreen() {
   const { profiles, activeProfile, activate, create } = useProfiles();
   const [dialog, setDialog] = useState<'delete' | 'noConnection' | null>(null);
-
+  function activateNext() {
+    if (profiles.length < 2) return;
+    const i = profiles.findIndex((p) => p.id === activeProfile?.id);
+    const next = profiles[(i + 1) % profiles.length];
+    activate(next.id).catch((e) =>
+      console.error('Nie udało się aktywować profilu', e),
+    );
+  }
   return (
     <SafeAreaView style={styles.container}>
       <ScrollView contentContainerStyle={styles.content}>
@@ -153,7 +160,10 @@ export default function DevScreen() {
         </Pressable>
         <Label style={styles.gap}>Profile (test B5)</Label>
         <Pressable onPress={() => create(`TEST${profiles.length}`)}>
-          <Mono>+ DODAJ PROFIL</Mono>
+          <Mono>DODAJ PROFIL</Mono>
+        </Pressable>
+        <Pressable onPress={activateNext}>
+          <Mono>AKTYWUJ NASTĘPNY PROFIL</Mono>
         </Pressable>
         {profiles.map((p) => (
           <Pressable key={p.id} onPress={() => activate(p.id)}>
