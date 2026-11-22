@@ -8,7 +8,7 @@ type Props = {
   label: string;
   onPress: () => void;
   variant?: 'outline' | 'danger';
-  cutCorner?: boolean; // tylko dla outline: CLOSE w 19 ma ścięty róg, CANCEL i QUIT nie
+  cutCorner?: boolean;
 };
 
 const CUT = 10;

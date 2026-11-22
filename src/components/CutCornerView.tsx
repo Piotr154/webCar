@@ -3,7 +3,7 @@ import { StyleSheet, View, type StyleProp, type ViewStyle } from 'react-native';
 import Svg, { Polygon } from 'react-native-svg';
 
 type Props = {
-  cut: number; // ile punktów odciąć z prawego dolnego rogu (0 = zwykły prostokąt)
+  cut: number;
   fill?: string;
   stroke?: string;
   strokeWidth?: number;
@@ -11,8 +11,6 @@ type Props = {
   children?: ReactNode;
 };
 
-// Prostokąt ze ściętym prawym dolnym rogiem — odpowiednik clip-path z makiet.
-// RN nie ma clip-path, więc tło (i ewentualną ramkę) rysujemy wielokątem SVG pod treścią.
 export function CutCornerView({
   cut,
   fill = 'transparent',
@@ -23,7 +21,6 @@ export function CutCornerView({
 }: Props) {
   const [size, setSize] = useState({ width: 0, height: 0 });
   const { width: w, height: h } = size;
-  // Ramka SVG jest rysowana po środku linii, więc przesuwamy ją do środka o połowę grubości.
   const s = strokeWidth / 2;
   const points = [
     `${s},${s}`,
