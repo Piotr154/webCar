@@ -1,9 +1,12 @@
 import { Link, type Href } from 'expo-router';
-import { StyleSheet, Text } from 'react-native';
+import { StyleSheet, View } from 'react-native';
+import { useSafeAreaInsets } from 'react-native-safe-area-context';
 
-import { ScreenStub } from '@/components/ScreenStub';
+import { MenuButton } from '@/components/MenuButton';
+import { Heading, Label } from '@/components/Typography';
+import { openMenu } from '@/navigation';
 import { useProfiles } from '@/state/ProfileContext';
-import { colors } from '@/theme';
+import { colors, space } from '@/theme';
 
 const SCREENS: { href: Href; label: string }[] = [
   { href: '/drive', label: 'DRIVE' },
@@ -12,23 +15,60 @@ const SCREENS: { href: Href; label: string }[] = [
 
 export default function HomeScreen() {
   const { activeProfile } = useProfiles();
+  const insets = useSafeAreaInsets();
 
   return (
-    <ScreenStub title="WEBCAR" mockup="08, 08A" owner="B">
-      <Text style={styles.link}>DRIVER: {activeProfile?.name ?? '—'}</Text>
+    <View style={[styles.screen, { paddingTop: insets.top + space.xl }]}>
+      <View style={styles.topRow}>
+        <Label size={16} color={colors.muted2} style={styles.hello}>
+          Hello {activeProfile?.name ?? ''}
+        </Label>
+        <MenuButton onPress={() => openMenu('/')} />
+      </View>
+
+      <View style={styles.logoRow}>
+        <View style={styles.logoBar} />
+        <Heading size={95} style={styles.logo}>
+          WebCar
+        </Heading>
+      </View>
+
       {SCREENS.map((s) => (
         <Link key={s.label} href={s.href} style={styles.link}>
           {s.label} ›
         </Link>
       ))}
-      <Text style={styles.note}>
-        Tymczasowe linki. Pozostałe ekrany są w MENU.
-      </Text>
-    </ScreenStub>
+    </View>
   );
 }
 
 const styles = StyleSheet.create({
-  link: { color: colors.text, fontSize: 18, paddingVertical: 10 },
-  note: { color: colors.muted3, fontSize: 12, marginTop: 12 },
+  screen: { flex: 1, backgroundColor: colors.background },
+  topRow: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'space-between',
+    paddingHorizontal: space.l,
+  },
+  hello: { letterSpacing: 3.2 },
+  logoRow: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: space.m,
+    paddingTop: 34,
+    paddingHorizontal: space.l,
+  },
+  logoBar: {
+    width: 8,
+    height: 74,
+    backgroundColor: colors.accent,
+    transform: [{ skewX: '-12deg' }],
+  },
+  logo: { letterSpacing: -0.88 },
+  link: {
+    color: colors.text,
+    fontSize: 18,
+    paddingVertical: 10,
+    paddingHorizontal: space.l,
+  },
 });
