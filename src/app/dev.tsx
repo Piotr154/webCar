@@ -1,5 +1,6 @@
 import { Button } from '@/components/Button';
 import { InfoTile } from '@/components/InfoTile';
+import { PrimaryButton } from '@/components/PrimaryButton';
 import { ScreenHeader } from '@/components/ScreenHeader';
 import { SignalBars } from '@/components/SignalBars';
 import { Heading, Label, Mono } from '@/components/Typography';
@@ -73,6 +74,31 @@ export default function DevScreen() {
             onPress={() => console.log('close')}
           />
         </View>
+        <Label style={styles.gap}>PrimaryButton (B6)</Label>
+        <View style={styles.stack}>
+          <PrimaryButton
+            label="Drive"
+            size="large"
+            onPress={() => console.log('drive')}
+          />
+          <PrimaryButton
+            label="Drive"
+            size="large"
+            disabled
+            onPress={() =>
+              console.log('drive (wyłączony — nie powinno się pojawić)')
+            }
+          />
+          <PrimaryButton
+            label="Use this profile"
+            onPress={() => console.log('use this profile')}
+          />
+          <PrimaryButton
+            label="Test horn"
+            icon="horn"
+            onPress={() => console.log('test horn')}
+          />
+        </View>
         <Label style={styles.gap}>Heading 88</Label>
         <Heading size={88}>WebCar</Heading>
         <Label style={styles.gap}>Heading 34</Label>
@@ -120,6 +146,7 @@ const styles = StyleSheet.create({
   gap: { marginTop: space.l },
   tileRow: { flexDirection: 'row', gap: space.s, marginTop: space.s },
   tile: { flex: 1 },
+  stack: { gap: space.m, marginTop: space.s },
   buttonRow: { flexDirection: 'row', gap: 10, marginTop: space.s },
   connection: { flexDirection: 'row', alignItems: 'center', gap: 10 },
   barsRow: {
