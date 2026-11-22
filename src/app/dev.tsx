@@ -1,3 +1,4 @@
+import { Button } from '@/components/Button';
 import { InfoTile } from '@/components/InfoTile';
 import { ScreenHeader } from '@/components/ScreenHeader';
 import { SignalBars } from '@/components/SignalBars';
@@ -48,6 +49,30 @@ export default function DevScreen() {
           ))}
           <SignalBars level={1} size="large" color={colors.danger} />
         </View>
+        <Label style={styles.gap}>Button (B6)</Label>
+        <View style={styles.buttonRow}>
+          <Button label="Cancel" onPress={() => console.log('cancel')} />
+          <Button
+            label="Delete"
+            variant="danger"
+            onPress={() => console.log('delete')}
+          />
+        </View>
+        <View style={styles.buttonRow}>
+          <Button label="Quit" onPress={() => console.log('quit')} />
+          <Button
+            label="Retry"
+            variant="danger"
+            onPress={() => console.log('retry')}
+          />
+        </View>
+        <View style={styles.buttonRow}>
+          <Button
+            label="Close"
+            cutCorner
+            onPress={() => console.log('close')}
+          />
+        </View>
         <Label style={styles.gap}>Heading 88</Label>
         <Heading size={88}>WebCar</Heading>
         <Label style={styles.gap}>Heading 34</Label>
@@ -95,6 +120,7 @@ const styles = StyleSheet.create({
   gap: { marginTop: space.l },
   tileRow: { flexDirection: 'row', gap: space.s, marginTop: space.s },
   tile: { flex: 1 },
+  buttonRow: { flexDirection: 'row', gap: 10, marginTop: space.s },
   connection: { flexDirection: 'row', alignItems: 'center', gap: 10 },
   barsRow: {
     flexDirection: 'row',
