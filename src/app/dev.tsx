@@ -1,4 +1,6 @@
+import { MenuButton } from '@/components/MenuButton';
 import { Heading, Label, Mono } from '@/components/Typography';
+import { resetDb } from '@/db/db';
 import { useProfiles } from '@/state/ProfileContext';
 import { colors, space } from '@/theme';
 import { Pressable, StyleSheet } from 'react-native';
@@ -9,6 +11,8 @@ export default function DevScreen() {
 
   return (
     <SafeAreaView style={styles.container}>
+      <Label>MenuButton (B6)</Label>
+      <MenuButton onPress={() => console.log('menu')} />
       <Label style={styles.gap}>Heading 88</Label>
       <Heading size={88}>WebCar</Heading>
       <Label style={styles.gap}>Heading 34</Label>
@@ -21,6 +25,18 @@ export default function DevScreen() {
       <Label>Hello Karol</Label>
       <Label style={styles.gap}>Mono</Label>
       <Mono>24 MS · 04:12</Mono>
+      <Label style={styles.gap}>Baza</Label>
+      <Pressable
+        onPress={() =>
+          resetDb()
+            .then(() =>
+              console.log('Baza zresetowana — przeładuj aplikację (r)'),
+            )
+            .catch((e) => console.error('Reset bazy nie udał się', e))
+        }
+      >
+        <Mono color={colors.danger}>RESET BAZY</Mono>
+      </Pressable>
       <Label style={styles.gap}>Profile (test B5)</Label>
       <Pressable onPress={() => create(`TEST${profiles.length}`)}>
         <Mono>+ DODAJ PROFIL</Mono>
