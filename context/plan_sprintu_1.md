@@ -1,6 +1,6 @@
 # WebCar — aplikacja mobilna: podział pracy i plan Sprintu 1
 
-Stan: 22 listopada 2026 · wersja dokumentu 1.15 · zgodna z kontekstem v2.31 i makietami z 3 XI (lista zmian na końcu)
+Stan: 22 listopada 2026 · wersja dokumentu 1.16 · zgodna z kontekstem v2.32 i makietami z 3 XI (lista zmian na końcu)
 
 ## W skrócie
 
@@ -176,7 +176,7 @@ export function getProfiles(): Promise<Profile[]>;
 
 // src/state/ProfileContext.tsx — B
 useProfiles(): { profiles: Profile[]; activeProfile: Profile | null;
-                 activate; create; rename; remove; update }
+                 activate; create; rename; remove; update; reload }
 ```
 
 **Zadania Sprintu 1** — szczegóły każdego zadania w kolejnych sekcjach.
@@ -201,7 +201,7 @@ useProfiles(): { profiles: Profile[]; activeProfile: Profile | null;
 | B6 | Komponenty bazowe | B | B1, B2 | Musi | Gotowe |
 | B7 | Ekran Menu (09) | B | B3, B6 | Musi | Gotowe |
 | B8 | Ekran Home (08, 08A) | B | B5, B6, A5 | Musi | Gotowe, czeka na A5 |
-| B9 | Ekran `/dev` — katalog komponentów | B | B6 | Może poczekać | Do zrobienia |
+| B9 | Ekran `/dev` — katalog komponentów | B | B6 | Może poczekać | Gotowe |
 | W3 | Test na sprzęcie: hotspot + ESP32 + aplikacja | A+B | A3, firmware | Musi | Do zrobienia |
 | W4 | Demo, retro, plan Sprintu 2 | A+B | wszystkie | Musi | Do zrobienia |
 
@@ -946,6 +946,12 @@ Największe ryzyko to opóźniony firmware — dlatego symulator jest w pierwszy
 Jeśli w Sprincie 3 zabraknie czasu na całą aplikację: wymagania z sekcji 10 (sterowanie, wideo, telemetria, profile, historia sesji, dźwięk i światło) są nienaruszalne. Pierwszymi kandydatami do uproszczenia są tryb GYRO, rysunek auta na Home i dopracowanie animacji.
 
 ## Zmiany w tej wersji
+
+### 1.16 (22 XI) — B9 gotowe, wszystkie zadania B ze Sprintu 1 zrobione
+
+- **B9 gotowe:** `/dev` z katalogiem komponentów i przyciskami Reset bazy, + Dodaj profil, Aktywuj następny i Profile z makiet. Z zadań B zostaje tylko podłączenie `useConnection()` na Home po A5.
+- **Kontrakt `useProfiles()` rozszerzony o `reload()`:** akcje providera wołają ją same; z zewnątrz tylko po zmianie bazy poza providerem (np. `resetDb()` na `/dev`). Zmiana dodaje pole, niczego nie psuje.
+- **Kolejność `getProfiles()`:** aktywny profil jest zawsze pierwszy (pod ekran 10). Kto potrzebuje stałej kolejności (np. przełączanie po kolei), sortuje kopię listy po `id`.
 
 ### 1.15 (22 XI) — B8 gotowe (bez A5)
 
