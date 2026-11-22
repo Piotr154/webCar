@@ -1,5 +1,6 @@
 import { InfoTile } from '@/components/InfoTile';
 import { ScreenHeader } from '@/components/ScreenHeader';
+import { SignalBars } from '@/components/SignalBars';
 import { Heading, Label, Mono } from '@/components/Typography';
 import { resetDb } from '@/db/db';
 import { useProfiles } from '@/state/ProfileContext';
@@ -22,7 +23,10 @@ export default function DevScreen() {
             KAROL
           </InfoTile>
           <InfoTile label="Connection" style={styles.tile}>
-            ONLINE
+            <View style={styles.connection}>
+              <SignalBars level={4} />
+              <Heading size={26}>ONLINE</Heading>
+            </View>
           </InfoTile>
         </View>
         <View style={styles.tileRow}>
@@ -36,6 +40,13 @@ export default function DevScreen() {
           >
             45%
           </InfoTile>
+        </View>
+        <Label style={styles.gap}>SignalBars (B6)</Label>
+        <View style={styles.barsRow}>
+          {[0, 1, 2, 3, 4].map((level) => (
+            <SignalBars key={level} level={level} size="large" />
+          ))}
+          <SignalBars level={1} size="large" color={colors.danger} />
         </View>
         <Label style={styles.gap}>Heading 88</Label>
         <Heading size={88}>WebCar</Heading>
@@ -84,4 +95,11 @@ const styles = StyleSheet.create({
   gap: { marginTop: space.l },
   tileRow: { flexDirection: 'row', gap: space.s, marginTop: space.s },
   tile: { flex: 1 },
+  connection: { flexDirection: 'row', alignItems: 'center', gap: 10 },
+  barsRow: {
+    flexDirection: 'row',
+    alignItems: 'flex-end',
+    gap: space.l,
+    marginTop: space.s,
+  },
 });
