@@ -6,22 +6,66 @@ import { ScreenHeader } from '@/components/ScreenHeader';
 import { SignalBars } from '@/components/SignalBars';
 import { Heading, Label, Mono } from '@/components/Typography';
 import { resetDb } from '@/db/db';
+import type { ProfileChanges } from '@/db/profiles';
 import { useProfiles } from '@/state/ProfileContext';
-import { colors, space } from '@/theme';
+import { colors, space, underglowColors } from '@/theme';
 import { useState } from 'react';
 import { Pressable, ScrollView, StyleSheet, View } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 
+const MOCKUP_PROFILES: { name: string; changes: ProfileChanges }[] = [
+  {
+    name: 'KAROL',
+    changes: {
+      ledColor: underglowColors[0],
+      powerLimit: 45,
+      steering: 'STICK',
+      camera: true,
+      blinkers: true,
+      autostopCm: 20,
+      brightness: 60,
+      horn: 3,
+      volume: 22,
+      radio: 1,
+    },
+  },
+  { name: 'MAJA', changes: { ledColor: underglowColors[4] } },
+  {
+    name: 'DEMO / EXPO',
+    changes: { ledColor: underglowColors[1], powerLimit: 25 },
+  },
+  {
+    name: 'BENCH',
+    changes: { ledColor: underglowColors[6], powerLimit: 100 },
+  },
+];
+
 export default function DevScreen() {
-  const { profiles, activeProfile, activate, create, reload } = useProfiles();
+  const { profiles, activeProfile, activate, create, update, reload } =
+    useProfiles();
   const [dialog, setDialog] = useState<'delete' | 'noConnection' | null>(null);
+
   function activateNext() {
     if (profiles.length < 2) return;
-    const i = profiles.findIndex((p) => p.id === activeProfile?.id);
-    const next = profiles[(i + 1) % profiles.length];
+    // getProfiles() stawia aktywny profil na początku, więc do przełączania
+    // bierzemy stałą kolejność: od najstarszego (najmniejsze id).
+    const ordered = [...profiles].sort((a, b) => a.id - b.id);
+    const i = ordered.findIndex((p) => p.id === activeProfile?.id);
+    const next = ordered[(i + 1) % ordered.length];
     activate(next.id).catch((e) =>
       console.error('Nie udało się aktywować profilu', e),
     );
+  }
+
+  async function addMockupProfiles() {
+    let karolId: number | null = null;
+    for (const mock of MOCKUP_PROFILES) {
+      const existing = profiles.find((p) => p.name.toUpperCase() === mock.name);
+      const id = existing ? existing.id : await create(mock.name);
+      await update(id, mock.changes);
+      if (mock.name === 'KAROL') karolId = id;
+    }
+    if (karolId !== null) await activate(karolId);
   }
   return (
     <SafeAreaView style={styles.container}>
@@ -147,24 +191,47 @@ export default function DevScreen() {
         <Label style={styles.gap}>Mono</Label>
         <Mono>24 MS · 04:12</Mono>
         <Label style={styles.gap}>Baza</Label>
-        <Pressable
-          onPress={() =>
-            resetDb()
-              .then(reload)
-              .catch((e) => console.error('Reset bazy nie udał się', e))
-          }
-        >
-          <Mono color={colors.danger}>RESET BAZY</Mono>
-        </Pressable>
-        <Label style={styles.gap}>Profile (test B5)</Label>
-        <Pressable onPress={() => create(`TEST${profiles.length}`)}>
-          <Mono>DODAJ PROFIL</Mono>
-        </Pressable>
-        <Pressable onPress={activateNext}>
-          <Mono>AKTYWUJ NASTĘPNY PROFIL</Mono>
-        </Pressable>
+        <View style={styles.buttonRow}>
+          <Button
+            label="Reset bazy"
+            variant="danger"
+            onPress={() =>
+              resetDb()
+                .then(reload)
+                .catch((e) => console.error('Reset bazy nie udał się', e))
+            }
+          />
+        </View>
+        <Label style={styles.gap}>Profile</Label>
+        <View style={styles.buttonRow}>
+          <Button
+            label="+ Dodaj profil"
+            onPress={() =>
+              create(`TEST${profiles.length}`).catch((e) =>
+                console.error('Nie udało się dodać profilu', e),
+              )
+            }
+          />
+        </View>
+        <View style={styles.buttonRow}>
+          <Button label="Aktywuj następny" onPress={activateNext} />
+        </View>
+        <View style={styles.buttonRow}>
+          <Button
+            label="Profile z makiet"
+            onPress={() =>
+              addMockupProfiles().catch((e) =>
+                console.error('Nie udało się dodać profili z makiet', e),
+              )
+            }
+          />
+        </View>
         {profiles.map((p) => (
-          <Pressable key={p.id} onPress={() => activate(p.id)}>
+          <Pressable
+            key={p.id}
+            onPress={() => activate(p.id)}
+            style={styles.profileItem}
+          >
             <Mono>
               {p.id === activeProfile?.id ? '● ' : '○ '}
               {p.name}
@@ -184,6 +251,7 @@ const styles = StyleSheet.create({
   tile: { flex: 1 },
   stack: { gap: space.m, marginTop: space.s },
   buttonRow: { flexDirection: 'row', gap: 10, marginTop: space.s },
+  profileItem: { paddingVertical: space.s },
   connection: { flexDirection: 'row', alignItems: 'center', gap: 10 },
   barsRow: {
     flexDirection: 'row',
