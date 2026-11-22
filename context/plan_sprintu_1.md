@@ -1,6 +1,6 @@
 # WebCar — aplikacja mobilna: podział pracy i plan Sprintu 1
 
-Stan: 22 listopada 2026 · wersja dokumentu 1.16 · zgodna z kontekstem v2.32 i makietami z 3 XI (lista zmian na końcu)
+Stan: 22 listopada 2026 · wersja dokumentu 1.17 · zgodna z kontekstem v2.33 i makietami z 3 XI (lista zmian na końcu)
 
 ## W skrócie
 
@@ -842,11 +842,11 @@ Lista nie obejmuje rzadkich odcieni z makiet (np. `#7d8085` — MIN/MAX w statys
 | Komponent | Wygląd z makiet | Gdzie |
 |---|---|---|
 | `ScreenHeader({ title })` | żółta kreska 6×46 pochylona o −12°; nad tytułem „WEBCAR” (Label, accent); tytuł Heading 34; po prawej `MenuButton`; padding 30/22/22 | 10, 13, 14, 15, 17, 18 |
-| `MenuButton({ onPress })` | kwadrat 48×48, ramka 1,5 `border`, trzy paski 20×3 `text2` co 5 | wszystkie ekrany pionowe |
+| `MenuButton()` | kwadrat 48×48, ramka 1,5 `border`, trzy paski 20×3 `text2` co 5; sam otwiera menu z bieżącą ścieżką | wszystkie ekrany pionowe |
 | `PrimaryButton({ label, onPress, disabled, size, icon })` | tło accent, napis Heading 44 (DRIVE) albo 28 (pozostałe) w kolorze `onAccent`, po prawej dwie strzałki » (TEST HORN: ikona głośnika), ścięty prawy dolny róg 18 (DRIVE) albo 14; wyłączony: tło `disabledBackground`, napis i strzałki `dim` (08A) | DRIVE, CREATE i SAVE (okna profilu), USE THIS PROFILE, TEST HORN, CLEAR HISTORY, START DRIVING, BACK TO DRIVING |
 | `Button({ label, variant })` | wysokość 52, napis Heading 24; `outline`: ramka 1,5 `border`, napis `text2`; `danger`: tło danger, napis prawie czarny, ścięty róg 10 (CLOSE w 19 też ma ścięty róg) | outline: CANCEL, QUIT, CLOSE; danger: DELETE, CLEAR, RETRY |
 | `InfoTile({ label, children })` | tło surface, lewa krawędź 4 `borderSoft`, Label 12, wartość Heading 26 | Home (4 kafelki) |
-| `SignalBars({ level, color, size })` | 4 paski pochylone o −14°, odstęp 3; Home: szerokość 5, wysokości 9/14/19/24; ekran jazdy: szerokość 6, wysokości 10/16/22/28; zgaszone w kolorze `disabled` | Home, ekran jazdy |
+| `SignalBars({ level, color, size, offColor })` | 4 paski pochylone o −14°, odstęp 3; Home: szerokość 5, wysokości 9/14/19/24; ekran jazdy: szerokość 6, wysokości 10/16/22/28; zgaszone w kolorze `disabled`, w 06 (CONNECTION LOST) czerwonawe `#4a3432` | Home, ekran jazdy |
 | `Dialog({ visible, title, marker, children })` | pod spodem `overlay`; panel surface z lewym czerwonym paskiem 3; tytuł Heading 32 (na ekranie jazdy 34); kwadracik 13×13 przed tytułem tylko przy błędach połączenia (06, 19) | 06, 11B, 16, 19 |
 
 **Wskazówki:**
@@ -946,6 +946,12 @@ Największe ryzyko to opóźniony firmware — dlatego symulator jest w pierwszy
 Jeśli w Sprincie 3 zabraknie czasu na całą aplikację: wymagania z sekcji 10 (sterowanie, wideo, telemetria, profile, historia sesji, dźwięk i światło) są nienaruszalne. Pierwszymi kandydatami do uproszczenia są tryb GYRO, rysunek auta na Home i dopracowanie animacji.
 
 ## Zmiany w tej wersji
+
+### 1.17 (22 XI) — uproszczenia komponentów B6
+
+- **`MenuButton` bez propsów:** sam odczytuje `usePathname()` i wywołuje `openMenu()`. `ScreenHeader`, `ScreenStub` i Home nie powtarzają już tego kodu, a nowe ekrany dostają poprawne wyróżnienie w menu bez dodatkowej linii.
+- **Tabela B6, `SignalBars`:** dopisany `offColor` — zgaszone kreski są zwykle `disabled`, ale w 06 (CONNECTION LOST) czerwonawe `#4a3432`; tego koloru nie ma jeszcze w `theme.ts`.
+- **`Button`:** wygląd wariantów `outline` i `danger` w jednym obiekcie `VARIANTS` (jak `SIZES` w `PrimaryButton`) zamiast osobnych warunków. Propsy bez zmian.
 
 ### 1.16 (22 XI) — B9 gotowe, wszystkie zadania B ze Sprintu 1 zrobione
 
