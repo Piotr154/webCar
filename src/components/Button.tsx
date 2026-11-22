@@ -4,15 +4,31 @@ import { CutCornerView } from '@/components/CutCornerView';
 import { Heading } from '@/components/Typography';
 import { colors } from '@/theme';
 
+const CUT = 10;
+
+const VARIANTS = {
+  outline: {
+    fill: undefined,
+    stroke: colors.border,
+    strokeWidth: 1.5,
+    text: colors.text2,
+    cut: 0,
+  },
+  danger: {
+    fill: colors.danger,
+    stroke: undefined,
+    strokeWidth: 0,
+    text: colors.onAccent,
+    cut: CUT,
+  },
+};
+
 type Props = {
   label: string;
   onPress: () => void;
-  variant?: 'outline' | 'danger';
-  cutCorner?: boolean;
+  variant?: keyof typeof VARIANTS;
+  cutCorner?: boolean; // ścięty róg w wariancie outline — CLOSE z 19
 };
-
-const CUT = 10;
-const BORDER = 1.5;
 
 export function Button({
   label,
@@ -20,7 +36,7 @@ export function Button({
   variant = 'outline',
   cutCorner = false,
 }: Props) {
-  const danger = variant === 'danger';
+  const v = VARIANTS[variant];
 
   return (
     <Pressable
@@ -29,13 +45,13 @@ export function Button({
       style={({ pressed }) => [styles.pressable, pressed && styles.pressed]}
     >
       <CutCornerView
-        cut={danger || cutCorner ? CUT : 0}
-        fill={danger ? colors.danger : 'transparent'}
-        stroke={danger ? undefined : colors.border}
-        strokeWidth={danger ? 0 : BORDER}
+        cut={cutCorner ? CUT : v.cut}
+        fill={v.fill}
+        stroke={v.stroke}
+        strokeWidth={v.strokeWidth}
         style={styles.box}
       >
-        <Heading size={24} color={danger ? colors.onAccent : colors.text2}>
+        <Heading size={24} color={v.text}>
           {label}
         </Heading>
       </CutCornerView>

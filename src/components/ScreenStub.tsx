@@ -1,10 +1,9 @@
-import { router, useCanGoBack, usePathname } from 'expo-router';
+import { router, useCanGoBack } from 'expo-router';
 import type { ReactNode } from 'react';
 import { Pressable, StyleSheet, Text, View } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 
 import { MenuButton } from '@/components/MenuButton';
-import { openMenu } from '@/navigation';
 import { colors, space } from '@/theme';
 
 type Props = {
@@ -18,13 +17,12 @@ const HIT_SLOP = 16;
 
 export function ScreenStub({ title, mockup, owner, children }: Props) {
   const canGoBack = useCanGoBack();
-  const pathname = usePathname();
 
   return (
     <SafeAreaView style={styles.container}>
       <View style={styles.header}>
         <Text style={styles.title}>{title}</Text>
-        <MenuButton onPress={() => openMenu(pathname)} />
+        <MenuButton />
       </View>
       <Text style={styles.info}>
         makieta {mockup} · moduł {owner}
