@@ -1,6 +1,6 @@
 # WebCar — aplikacja mobilna: podział pracy i plan Sprintu 1
 
-Stan: 20 listopada 2026 · wersja dokumentu 1.12 · zgodna z kontekstem v2.28 i makietami z 3 XI (lista zmian na końcu)
+Stan: 22 listopada 2026 · wersja dokumentu 1.13 · zgodna z kontekstem v2.29 i makietami z 3 XI (lista zmian na końcu)
 
 ## W skrócie
 
@@ -18,7 +18,7 @@ Stan: 20 listopada 2026 · wersja dokumentu 1.12 · zgodna z kontekstem v2.28 i 
 
 ## Co jest w repo i co z tego wynika
 
-Projekt aplikacji istnieje (Expo SDK 58): ekrany są jeszcze zaślepkami; gotowe są typy protokołu (A1), symulator auta (A2) i baza z profilami (B4, B5) — aktualny stan prac jest w sekcji 8 kontekstu. Firmware ma tylko blokujący program testowy, a protokół v1.0 jest zamrożony (sekcja 9 kontekstu), ale firmware go jeszcze nie obsługuje. Dlatego aplikację trzeba na początku pisać pod symulator auta, a nie pod prawdziwe ESP32.
+Projekt aplikacji istnieje (Expo SDK 58): ekrany są jeszcze zaślepkami; gotowe są typy protokołu (A1), symulator auta (A2), baza z profilami (B4, B5) i komponenty bazowe (B6) — aktualny stan prac jest w sekcji 8 kontekstu. Firmware ma tylko blokujący program testowy, a protokół v1.0 jest zamrożony (sekcja 9 kontekstu), ale firmware go jeszcze nie obsługuje. Dlatego aplikację trzeba na początku pisać pod symulator auta, a nie pod prawdziwe ESP32.
 
 | Plik | Zawartość | Znaczenie dla aplikacji |
 |---|---|---|
@@ -198,7 +198,7 @@ useProfiles(): { profiles: Profile[]; activeProfile: Profile | null;
 | B3 | Nawigacja i ekrany-zaślepki | B | W1 | Musi | Gotowe |
 | B4 | Baza SQLite i repozytorium profili | B | W1 | Musi | Gotowe |
 | B5 | `ProfileProvider` i `useProfiles` | B | B4 | Musi | Gotowe |
-| B6 | Komponenty bazowe | B | B1, B2 | Musi | Do zrobienia |
+| B6 | Komponenty bazowe | B | B1, B2 | Musi | Gotowe |
 | B7 | Ekran Menu (09) | B | B3, B6 | Musi | Do zrobienia |
 | B8 | Ekran Home (08, 08A) | B | B5, B6, A5 | Musi | Do zrobienia |
 | B9 | Ekran `/dev` — katalog komponentów | B | B6 | Może poczekać | Do zrobienia |
@@ -946,6 +946,11 @@ Największe ryzyko to opóźniony firmware — dlatego symulator jest w pierwszy
 Jeśli w Sprincie 3 zabraknie czasu na całą aplikację: wymagania z sekcji 10 (sterowanie, wideo, telemetria, profile, historia sesji, dźwięk i światło) są nienaruszalne. Pierwszymi kandydatami do uproszczenia są tryb GYRO, rysunek auta na Home i dopracowanie animacji.
 
 ## Zmiany w tej wersji
+
+### 1.13 (22 XI) — B6 gotowe
+
+- **B6 gotowe:** `MenuButton`, `ScreenHeader`, `InfoTile`, `SignalBars`, `Button`, `PrimaryButton`, `Dialog` w `src/components/`, wszystkie pokazane na `/dev`. Ścięty róg robi jeden wspólny `CutCornerView` (wielokąt SVG) — z dwóch sposobów ze wskazówek wybrany SVG, bo kwadrat w kolorze tła nie działa na różnych tłach ani przy ramce (CLOSE w 19). Ekrany B7, B8 i Sprintu 2 składają się z tych komponentów.
+- **`Heading` bez `lineHeight`** — przy `lineHeight` równym rozmiarowi czcionki iOS ucina litery (sekcja 11 kontekstu, „Czcionki”).
 
 ### 1.12 (20 XI) — B5 gotowe
 
