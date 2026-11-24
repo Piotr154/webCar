@@ -1,6 +1,6 @@
 # WebCar — aplikacja mobilna: podział pracy i plan Sprintu 1
 
-Stan: 24 listopada 2026 · wersja dokumentu 1.22 · zgodna z kontekstem v2.38 i makietami z 3 XI (lista zmian na końcu)
+Stan: 24 listopada 2026 · wersja dokumentu 1.23 · zgodna z kontekstem v2.39 i makietami z 3 XI (lista zmian na końcu)
 
 ## W skrócie
 
@@ -952,6 +952,12 @@ Największe ryzyko to opóźniony firmware — dlatego symulator jest w pierwszy
 Jeśli w Sprincie 3 zabraknie czasu na całą aplikację: wymagania z sekcji 10 (sterowanie, wideo, telemetria, profile, historia sesji, dźwięk i światło) są nienaruszalne. Pierwszymi kandydatami do uproszczenia są tryb GYRO, rysunek auta na Home i dopracowanie animacji.
 
 ## Zmiany w tej wersji
+
+### 1.23 (24 XI) — przycisk menu w tym samym miejscu na wszystkich ekranach
+
+- **Menu (B7):** ✕ był ok. 6 punktów niżej niż `MenuButton` na Home — `Heading` 38 bez `lineHeight` ma wiersz ok. 60 (Saira Condensed: 1,574 × rozmiar), więc wyśrodkowany przycisk zjeżdżał w dół. `marginVertical: -6` przy WEBCAR zmniejsza wiersz do 48, jak w makiecie 09 (`38px/1`); pozycje menu są przez to ok. 12 punktów wyżej. Ta sama technika co przy WEBCAR 88 na Home.
+- **`ScreenHeader` (B6):** górny odstęp `insets.top + space.xl` jak na Home (ekran stawia nagłówek na samej górze, bez `SafeAreaView` od góry) i `MenuButton` przy górnej krawędzi wiersza (`alignSelf: 'flex-start'`) — dwulinijkowy tytuł jest wyższy niż 48, więc wyśrodkowany przycisk zjeżdżał w dół. Ekrany ze Sprintu 2 dostają poprawne położenie bez dodatkowego kodu.
+- **`ScreenStub` (B3):** nagłówek z `ScreenHeader` zamiast własnego (zwykły tekst + `MenuButton` w `SafeAreaView` z odstępem 22 — przycisk był ok. 8 punktów wyżej niż na Home). Zaślepki wyglądają jak docelowe nagłówki. Na `/dev` przykłady `ScreenHeader` mają przez to więcej miejsca nad sobą (`/dev` ma własne `SafeAreaView`) — tylko ekran deweloperski.
 
 ### 1.22 (24 XI) — Home: miejsce na auto bez tła
 

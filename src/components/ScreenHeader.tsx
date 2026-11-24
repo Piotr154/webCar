@@ -1,4 +1,5 @@
 import { StyleSheet, View } from 'react-native';
+import { useSafeAreaInsets } from 'react-native-safe-area-context';
 
 import { MenuButton } from '@/components/MenuButton';
 import { Heading, Label } from '@/components/Typography';
@@ -9,8 +10,10 @@ type Props = {
 };
 
 export function ScreenHeader({ title }: Props) {
+  const insets = useSafeAreaInsets();
+
   return (
-    <View style={styles.row}>
+    <View style={[styles.row, { paddingTop: insets.top + space.xl }]}>
       <View style={styles.bar} />
       <View style={styles.texts}>
         <Label color={colors.accent} style={styles.brand}>
@@ -18,7 +21,9 @@ export function ScreenHeader({ title }: Props) {
         </Label>
         <Heading>{title}</Heading>
       </View>
-      <MenuButton />
+      <View style={styles.menu}>
+        <MenuButton />
+      </View>
     </View>
   );
 }
@@ -28,7 +33,6 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     alignItems: 'center',
     gap: space.m,
-    paddingTop: space.xl,
     paddingHorizontal: space.l,
     paddingBottom: space.l,
   },
@@ -40,4 +44,7 @@ const styles = StyleSheet.create({
   },
   texts: { flex: 1 },
   brand: { letterSpacing: 2.4, lineHeight: 12 },
+  // Przycisk przy górnej krawędzi wiersza, a nie wyśrodkowany: dwulinijkowy tytuł
+  // jest wyższy niż 48, a przycisk ma stać tam, gdzie na Home i w menu.
+  menu: { alignSelf: 'flex-start' },
 });
