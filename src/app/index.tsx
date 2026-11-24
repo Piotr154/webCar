@@ -1,4 +1,3 @@
-import { CutCornerView } from '@/components/CutCornerView';
 import { InfoTile } from '@/components/InfoTile';
 import { MenuButton } from '@/components/MenuButton';
 import { PrimaryButton } from '@/components/PrimaryButton';
@@ -36,7 +35,7 @@ export default function HomeScreen() {
         </Heading>
       </Pressable>
 
-      <CutCornerView cut={22} fill={colors.surfaceLow} style={styles.car} />
+      <View style={styles.car} />
 
       <View style={styles.tiles}>
         <View style={styles.tileRow}>
@@ -124,7 +123,8 @@ const styles = StyleSheet.create({
   // Ujemny margines: Heading 88 bez lineHeight ma wysoki wiersz z pustym miejscem
   // nad i pod literami — zmniejszamy miejsce w układzie, litery zostają całe.
   logo: { letterSpacing: -0.88, marginVertical: -28 },
-  // Prostokąt na rysunek auta: zajmuje miejsce, które zostało, najwyżej 250 (makieta).
+  // Miejsce na rysunek auta, bez tła (auto bezpośrednio na tle ekranu):
+  // zajmuje miejsce, które zostało, najwyżej 250 (makieta).
   car: {
     flex: 1,
     maxHeight: 250,
