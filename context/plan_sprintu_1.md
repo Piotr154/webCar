@@ -1,6 +1,6 @@
 # WebCar — aplikacja mobilna: podział pracy i plan Sprintu 1
 
-Stan: 24 listopada 2026 · wersja dokumentu 1.24 · zgodna z kontekstem v2.40 i makietami z 3 XI (lista zmian na końcu)
+Stan: 25 listopada 2026 · wersja dokumentu 1.25 · zgodna z kontekstem v2.41 i makietami z 3 XI (lista zmian na końcu)
 
 ## W skrócie
 
@@ -18,11 +18,11 @@ Stan: 24 listopada 2026 · wersja dokumentu 1.24 · zgodna z kontekstem v2.40 i 
 
 ## Co jest w repo i co z tego wynika
 
-Projekt aplikacji istnieje (Expo SDK 58): gotowe są ekrany Home (B8) i Menu (B7), pozostałe są jeszcze zaślepkami; gotowe są też typy protokołu (A1), symulator auta (A2), baza z profilami (B4, B5) i komponenty bazowe (B6) — aktualny stan prac jest w sekcji 8 kontekstu. Firmware ma tylko blokujący program testowy, a protokół v1.0 jest zamrożony (sekcja 9 kontekstu), ale firmware go jeszcze nie obsługuje. Dlatego aplikację trzeba na początku pisać pod symulator auta, a nie pod prawdziwe ESP32.
+Projekt aplikacji istnieje (Expo SDK 58): gotowe są ekrany Home z rysunkiem auta (B8, B10), Menu (B7) i `/dev` (B9), pozostałe są jeszcze zaślepkami; gotowe są też typy protokołu (A1), symulator auta (A2), łączność z pingiem i wskaźnikiem łącza (A3–A5), baza z profilami (B4, B5) i komponenty bazowe (B6) — aktualny stan prac jest w sekcji 8 kontekstu. Firmware ma tylko blokujący program testowy, a protokół v1.0 jest zamrożony (sekcja 9 kontekstu), ale firmware go jeszcze nie obsługuje. Dlatego aplikację trzeba na początku pisać pod symulator auta, a nie pod prawdziwe ESP32.
 
 | Plik | Zawartość | Znaczenie dla aplikacji |
 |---|---|---|
-| `context/WebCar_kontekst.md` (v2.27, 16 XI) | sprzęt, łączność (sekcja 3), zachowanie funkcji (4, 7), stack i stan prac (8), protokół (9), ekrany (11), stałe (12) | główne źródło — zadania niżej odwołują się do jego sekcji |
+| `context/WebCar_kontekst.md` | sprzęt, łączność (sekcja 3), zachowanie funkcji (4, 7), stack i stan prac (8), protokół (9), ekrany (11), stałe (12) | główne źródło — zadania niżej odwołują się do jego sekcji |
 | `context/WebCar_-_all_screens.html` | makiety 25 stanów ekranów (01–19, w tym 05A) | kolory, czcionki, teksty, układ; przy różnicy wygrywa opis z kontekstu |
 | `context/plan_sprintu_1.md` | ten plik: podział pracy, harmonogram, zadania Sprintu 1 | każde zadanie to jedno issue na GitHubie z tym samym ID |
 | `README.md` | uruchomienie projektu, komendy, struktura, decyzje (np. kursywa przez `skewX`) | pierwsze kroki po `git clone` |
@@ -848,7 +848,7 @@ Lista nie obejmuje rzadkich odcieni z makiet (np. `#7d8085` — MIN/MAX w statys
 
 | Komponent | Wygląd z makiet | Gdzie |
 |---|---|---|
-| `ScreenHeader({ title })` | żółta kreska 6×46 pochylona o −12°; nad tytułem „WEBCAR” (Label, accent); tytuł Heading 34; po prawej `MenuButton`; padding 30/22/22 | 10, 13, 14, 15, 17, 18 |
+| `ScreenHeader({ title })` | żółta kreska 6×46 pochylona o −12°; nad tytułem „WEBCAR” (Label, accent); tytuł Heading 34; po prawej `MenuButton` przy górnej krawędzi wiersza (w tym samym miejscu co na Home); padding `insets.top` + 30 / 22 / 22 — ekran stawia go na samej górze, bez `SafeAreaView` od góry | 10, 13, 14, 15, 17, 18 |
 | `MenuButton()` | kwadrat 48×48, ramka 1,5 `border`, trzy paski 20×3 `text2` co 5; sam otwiera menu z bieżącą ścieżką | wszystkie ekrany pionowe |
 | `PrimaryButton({ label, onPress, disabled, size, icon })` | tło accent, napis Heading 44 (DRIVE) albo 28 (pozostałe) w kolorze `onAccent`, po prawej dwie strzałki » (TEST HORN: ikona głośnika), ścięty prawy dolny róg 18 (DRIVE) albo 14; wyłączony: tło `disabledBackground`, napis i strzałki `dim` (08A) | DRIVE, CREATE i SAVE (okna profilu), USE THIS PROFILE, TEST HORN, CLEAR HISTORY, START DRIVING, BACK TO DRIVING |
 | `Button({ label, variant })` | wysokość 52, napis Heading 24; `outline`: ramka 1,5 `border`, napis `text2`; `danger`: tło danger, napis prawie czarny, ścięty róg 10 (CLOSE w 19 też ma ścięty róg) | outline: CANCEL, QUIT, CLOSE; danger: DELETE, CLEAR, RETRY |
@@ -965,9 +965,16 @@ Największe ryzyko to opóźniony firmware — dlatego symulator jest w pierwszy
 | Expo wyda nowe SDK, a Expo Go na iPhonie się zaktualizuje | projekt przestaje się otwierać w Expo Go | aktualizacja projektu (`npx expo install expo@latest`, potem `npx expo install --fix`) — zarezerwujcie na to 2 h, gdyby się zdarzyło |
 | Sprint 1 za duży | niedokończone fundamenty | tnijcie w tej kolejności: B9, A8, A6 (przechodzi do Sprintu 2); W3 zależy od firmware |
 
-Jeśli w Sprincie 3 zabraknie czasu na całą aplikację: wymagania z sekcji 10 (sterowanie, wideo, telemetria, profile, historia sesji, dźwięk i światło) są nienaruszalne. Pierwszymi kandydatami do uproszczenia są tryb GYRO, rysunek auta na Home i dopracowanie animacji.
+Jeśli w Sprincie 3 zabraknie czasu na całą aplikację: wymagania z sekcji 10 (sterowanie, wideo, telemetria, profile, historia sesji, dźwięk i światło) są nienaruszalne. Pierwszymi kandydatami do uproszczenia są tryb GYRO i dopracowanie animacji.
 
 ## Zmiany w tej wersji
+
+### 1.25 (25 XI) — porządki po A3–A5 i B10
+
+- **„Co jest w repo”:** lista gotowych rzeczy uzupełniona o A3–A5, B9 i B10; z tabeli plików zniknął numer wersji kontekstu (aktualna jest w nagłówku tego pliku).
+- **Tabela komponentów B6:** opis `ScreenHeader` zgodny z kodem (`insets.top` + 30, `MenuButton` przy górnej krawędzi wiersza).
+- **Ryzyka:** rysunek auta na Home nie jest już kandydatem do uproszczenia — zrobiony w B10.
+- **Kontekst, wiersz B5:** usunięta nieaktualna uwaga „Tymczasowo” (`DRIVER: <nazwa>` na Home i sekcja „Profile (test B5)” na `/dev` zniknęły w B8 i B9).
 
 ### 1.24 (24 XI) — B10: rysunek auta na Home
 
