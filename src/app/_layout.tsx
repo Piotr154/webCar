@@ -14,6 +14,7 @@ import { useEffect } from 'react';
 import { GestureHandlerRootView } from 'react-native-gesture-handler';
 
 import { startConnection } from '@/connection/connection';
+import { ConnectionProvider } from '@/state/ConnectionContext';
 import { ProfileProvider } from '@/state/ProfileContext';
 import { colors } from '@/theme';
 
@@ -43,25 +44,27 @@ export default function RootLayout() {
 
   return (
     <GestureHandlerRootView style={{ flex: 1 }}>
-      <ProfileProvider>
-        <StatusBar style="light" />
-        <Stack
-          screenOptions={{
-            headerShown: false,
-            contentStyle: { backgroundColor: colors.background },
-          }}
-        >
-          <Stack.Screen
-            name="menu"
-            options={{
-              presentation: 'transparentModal',
-              animation: 'fade',
-              contentStyle: { backgroundColor: 'transparent' },
+      <ConnectionProvider>
+        <ProfileProvider>
+          <StatusBar style="light" />
+          <Stack
+            screenOptions={{
+              headerShown: false,
+              contentStyle: { backgroundColor: colors.background },
             }}
-          />
-          <Stack.Screen name="drive" options={{ gestureEnabled: false }} />
-        </Stack>
-      </ProfileProvider>
+          >
+            <Stack.Screen
+              name="menu"
+              options={{
+                presentation: 'transparentModal',
+                animation: 'fade',
+                contentStyle: { backgroundColor: 'transparent' },
+              }}
+            />
+            <Stack.Screen name="drive" options={{ gestureEnabled: false }} />
+          </Stack>
+        </ProfileProvider>
+      </ConnectionProvider>
     </GestureHandlerRootView>
   );
 }
