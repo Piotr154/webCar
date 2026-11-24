@@ -1,6 +1,6 @@
 # WebCar — aplikacja mobilna: podział pracy i plan Sprintu 1
 
-Stan: 24 listopada 2026 · wersja dokumentu 1.21 · zgodna z kontekstem v2.37 i makietami z 3 XI (lista zmian na końcu)
+Stan: 24 listopada 2026 · wersja dokumentu 1.22 · zgodna z kontekstem v2.38 i makietami z 3 XI (lista zmian na końcu)
 
 ## W skrócie
 
@@ -674,7 +674,7 @@ export const colors = {
   background: '#000000',    // tło ekranów
   surface: '#0d0e10',       // kafelki, karty, popupy
   surface2: '#111214',
-  surfaceLow: '#0b0c0e',    // wiersze list (HORN), tło rysunku auta, nieaktywny CRUISE
+  surfaceLow: '#0b0c0e',    // wiersze list (HORN), nieaktywny CRUISE
   border: '#34363a',        // ramki przycisków (menu, CANCEL)
   borderSoft: '#2c2e32',    // lewa krawędź kafelków
   segmentOff: '#2a2c30',    // zgaszone segmenty suwaków
@@ -885,7 +885,7 @@ Lista nie obejmuje rzadkich odcieni z makiet (np. `#7d8085` — MIN/MAX w statys
 
 **B · zależy od: B5, B6, A5**
 
-1. Układ wg makiety 08, od góry: „HELLO ” + nazwa aktywnego profilu (Label 16, `muted2`; po pierwszym starcie HELLO DRIVER) i `MenuButton`; kreska 8×74 i „WEBCAR” (Heading 88 — może wychodzić za prawą krawędź, tak jest na makiecie); prostokąt 250 na rysunek auta (na razie pusty, ze ściętym rogiem); siatka 2×2 kafelków; DRIVE na dole.
+1. Układ wg makiety 08, od góry: „HELLO ” + nazwa aktywnego profilu (Label 16, `muted2`; po pierwszym starcie HELLO DRIVER) i `MenuButton`; kreska 8×74 i „WEBCAR” (Heading 88 — może wychodzić za prawą krawędź, tak jest na makiecie); miejsce 250 na rysunek auta (na razie puste; bez tła i ściętego rogu — auto stoi bezpośrednio na tle ekranu, zmiana względem makiety 08); siatka 2×2 kafelków; DRIVE na dole.
 2. Kafelki: DRIVER = `activeProfile.name`; CONNECTION = `SignalBars` i ONLINE albo czerwony ✕ i OFFLINE (08A); STEERING = STICK/GYRO; POWER LIMIT = `powerLimit` % w kolorze accent.
 3. DRIVE jest `disabled`, gdy `status !== 'online'`; naciśnięcie → `router.push('/drive')`.
 4. Do czasu A5 użyj tymczasowo `{ status: 'offline', bars: 0 }`.
@@ -952,6 +952,11 @@ Największe ryzyko to opóźniony firmware — dlatego symulator jest w pierwszy
 Jeśli w Sprincie 3 zabraknie czasu na całą aplikację: wymagania z sekcji 10 (sterowanie, wideo, telemetria, profile, historia sesji, dźwięk i światło) są nienaruszalne. Pierwszymi kandydatami do uproszczenia są tryb GYRO, rysunek auta na Home i dopracowanie animacji.
 
 ## Zmiany w tej wersji
+
+### 1.22 (24 XI) — Home: miejsce na auto bez tła
+
+- **Home (B8):** miejsce na rysunek auta bez szarego tła i ściętego rogu — auto będzie stało bezpośrednio na tle ekranu (zmiana względem makiety 08, uzgodniona z Jagodą). Układ bez zmian (`flex: 1`, `maxHeight: 250`).
+- **Rysunek auta nie ma jeszcze zadania ani grafiki** — do rozpisania na planowaniu Sprintu 2 (W4): najpierw ustalić, co ma tam być (zdjęcie auta, render, ilustracja).
 
 ### 1.21 (24 XI) — A4, A5 i B8 gotowe
 
