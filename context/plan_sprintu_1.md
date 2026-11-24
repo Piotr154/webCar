@@ -1,6 +1,6 @@
 # WebCar — aplikacja mobilna: podział pracy i plan Sprintu 1
 
-Stan: 24 listopada 2026 · wersja dokumentu 1.18 · zgodna z kontekstem v2.34 i makietami z 3 XI (lista zmian na końcu)
+Stan: 24 listopada 2026 · wersja dokumentu 1.19 · zgodna z kontekstem v2.35 i makietami z 3 XI (lista zmian na końcu)
 
 ## W skrócie
 
@@ -157,6 +157,7 @@ export function send(msg: AppToCar): boolean;          // false = brak połącze
 export function retryNow(): void;
 export function onTelemetry(cb: (t: TelMsg) => void): () => void;       // zwraca funkcję wypisania
 export function onStatusChange(cb: (s: ConnStatus) => void): () => void;
+export function getPingAvg(): number | null;          // średnia z 3 ostatnich RTT; null = brak pomiaru (— MS)
 
 // src/connection/sync.ts — właściciel A (zadanie A6)
 export function syncActiveProfile(): Promise<void>;   // cfg aktywnego profilu + sprawdzenie radia
@@ -188,7 +189,7 @@ useProfiles(): { profiles: Profile[]; activeProfile: Profile | null;
 | A1 | Typy protokołu i `config.ts` | A | W1, W2 | Musi | Gotowe |
 | A2 | Symulator auta | A | A1 | Musi | Gotowe |
 | A3 | Moduł łączności | A | A1, A2 | Musi | W toku |
-| A4 | Ping i wskaźnik jakości łącza | A | A3 | Musi | Do zrobienia |
+| A4 | Ping i wskaźnik jakości łącza | A | A3 | Musi | W toku |
 | A5 | `ConnectionProvider` i `useConnection` | A | A3, A4 | Musi | Do zrobienia |
 | A6 | Synchronizacja po połączeniu (profil, radio, LED) | A | A3, B4 | Musi | Do zrobienia |
 | A7 | Prototyp ekranu jazdy (multi-touch, 20 Hz, skręt stopniowy) | A | A3, B3 | Musi | Do zrobienia |
@@ -430,9 +431,9 @@ useProfiles(): { profiles: Profile[]; activeProfile: Profile | null;
 
 **Po co:** cztery kreski na Home i na ekranie jazdy (sekcja 3) oraz ping w ms. Ping jest też dla firmware znakiem, że aplikacja jest połączona (gaszenie taśmy, sekcja 6).
 
-1. W module łączności co `PING_INTERVAL_MS` (0,5 s), na każdym ekranie, gdy gniazdo jest otwarte, wysyłaj `{ t: 'ping', id }` (rosnące `id`) i zapisz czas wysłania w `Map`.
-2. Przy `pong`: `rtt = Date.now() - sentAt`. Trzymaj 3 ostatnie RTT; `pingAvg` = ich średnia. Usuwaj z mapy pingi starsze niż 3 s.
-3. Gdy przez 3 s nie przyszedł żaden `pong`, `pingAvg = null` — UI pokaże „— MS”.
+1. W module łączności co `PING_INTERVAL_MS` (0,5 s), na każdym ekranie, wysyłaj `{ t: 'ping', id }` (rosnące `id`) przez `send()` i zapisz czas wysłania w `Map` tylko, gdy `send()` zwróci `true`. Bez otwartego gniazda (także w tle) ping po prostu nie idzie — osobne zatrzymywanie nie jest potrzebne.
+2. Przy `pong`: `rtt = Date.now() - sentAt`. Trzymaj 3 ostatnie RTT (zerowane przy każdym nowym połączeniu). Usuwaj z mapy pingi starsze niż 3 s.
+3. `getPingAvg()`: średnia z zapisanych RTT, zaokrąglona do ms; `null`, gdy nie ma pomiarów albo przez 3 s nie przyszedł żaden `pong` — UI pokaże „— MS”.
 4. `src/connection/linkQuality.ts` — czysta funkcja bez Reacta:
 
    ```ts
@@ -447,7 +448,7 @@ useProfiles(): { profiles: Profile[]; activeProfile: Profile | null;
    }
    ```
 
-5. Obok: `pingColor(bars)` — 4 i 3 kreski: biały, 2: żółty (accent), 1: czerwony (danger).
+5. Na Sprint 2 (razem z kafelkiem pingu na ekranie jazdy — jedynym miejscem, które jej używa; Home pokazuje same kreski): `pingColor(bars)` — 4 i 3 kreski: biały, 2: żółty (accent), 1: czerwony (danger).
 
 **Oczekiwane wyniki:**
 
@@ -465,8 +466,9 @@ useProfiles(): { profiles: Profile[]; activeProfile: Profile | null;
 **Gotowe, gdy:**
 
 - [ ] wszystkie przypadki z tabeli dają oczekiwany wynik (testy w A8 albo ręcznie)
-- [ ] symulator, klawisz `l` → po ok. 1,5–2 s jedna kreska (średnia z 3 pingów co 0,5 s); ponownie `l` → wraca do 4
-- [ ] klawisz `w` → jedna kreska
+- [ ] połączenie z symulatorem nie zrywa się co 2–3 s (ping co 0,5 s jest znakiem obecności aplikacji)
+
+Klawisze `l` i `w` symulatora sprawdzamy w A5 — dopiero wtedy Home pokazuje kreski.
 
 ### A5 — ConnectionProvider i useConnection
 
@@ -484,6 +486,8 @@ useProfiles(): { profiles: Profile[]; activeProfile: Profile | null;
 
 - [ ] B używa `useConnection()` na Home
 - [ ] `console.count` na Home pokazuje najwyżej ok. 4 rendery na sekundę
+- [ ] symulator, klawisz `l` → po ok. 1,5–2 s jedna kreska na Home (średnia z 3 pingów co 0,5 s); ponownie `l` → wraca do 4 (kryterium z A4)
+- [ ] klawisz `w` → jedna kreska na Home (kryterium z A4)
 
 ### A6 — Synchronizacja po połączeniu: profil, radio, podświetlenie
 
@@ -946,6 +950,13 @@ Największe ryzyko to opóźniony firmware — dlatego symulator jest w pierwszy
 Jeśli w Sprincie 3 zabraknie czasu na całą aplikację: wymagania z sekcji 10 (sterowanie, wideo, telemetria, profile, historia sesji, dźwięk i światło) są nienaruszalne. Pierwszymi kandydatami do uproszczenia są tryb GYRO, rysunek auta na Home i dopracowanie animacji.
 
 ## Zmiany w tej wersji
+
+### 1.19 (24 XI) — A4: ping i wskaźnik łącza w toku
+
+- **A4 w toku:** ping co 0,5 s i pomiar RTT w `src/connection/connection.ts`, `src/connection/linkQuality.ts` z `computeLinkBars`. Wszystkie 8 przypadków z tabeli sprawdzone skryptem.
+- **Kontrakt `connection.ts` z `getPingAvg()`:** średnia z 3 ostatnich RTT albo `null` („— MS”). Czyta ją provider z A5.
+- **`pingColor` przeniesione na Sprint 2:** używa jej tylko kafelek pingu na ekranie jazdy; Home pokazuje same kreski.
+- **Kryteria z klawiszami `l` i `w` przeniesione z A4 do A5:** przed A5 nic nie pokazuje kresek.
 
 ### 1.18 (24 XI) — A3: moduł łączności w toku
 
