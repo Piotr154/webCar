@@ -1,6 +1,6 @@
 # WebCar — aplikacja mobilna: podział pracy i plan Sprintu 1
 
-Stan: 24 listopada 2026 · wersja dokumentu 1.23 · zgodna z kontekstem v2.39 i makietami z 3 XI (lista zmian na końcu)
+Stan: 24 listopada 2026 · wersja dokumentu 1.24 · zgodna z kontekstem v2.40 i makietami z 3 XI (lista zmian na końcu)
 
 ## W skrócie
 
@@ -205,6 +205,7 @@ useProfiles(): { profiles: Profile[]; activeProfile: Profile | null;
 | B7 | Ekran Menu (09) | B | B3, B6 | Musi | Gotowe |
 | B8 | Ekran Home (08, 08A) | B | B5, B6, A5 | Musi | Gotowe |
 | B9 | Ekran `/dev` — katalog komponentów | B | B6 | Może poczekać | Gotowe |
+| B10 | Rysunek auta na Home | A (moduł B, uzgodnione z Jagodą) | B8 | Może poczekać | Gotowe |
 | W3 | Test na sprzęcie: hotspot + ESP32 + aplikacja | A+B | A3, firmware | Musi | Do zrobienia |
 | W4 | Demo, retro, plan Sprintu 2 | A+B | wszystkie | Musi | Do zrobienia |
 
@@ -918,6 +919,21 @@ Lista nie obejmuje rzadkich odcieni z makiet (np. `#7d8085` — MIN/MAX w statys
 - [ ] ekran pokazuje wszystkie komponenty, a reset bazy przywraca jeden profil DRIVER
 - [ ] „Profile z makiet” daje Home jak na makiecie 08 (KAROL, STICK, 45 %)
 
+### B10 — Rysunek auta na Home (może poczekać)
+
+**A (moduł B, uzgodnione z Jagodą) · zależy od: B8**
+
+1. Grafiki w `assets/images/`: `car.png` (309×118), `car@2x.png` (618×236), `car@3x.png` (927×354) — PNG z przezroczystym tłem, przycięte do samego auta (pusty margines wokół zmniejszałby auto), bo auto stoi bezpośrednio na tle ekranu (bez szarego kafelka z makiety 08). React Native sam wybiera wersję `@2x` / `@3x` według ekranu.
+2. Home: `View` z miejscem na auto (`flex: 1`, `maxHeight: 250`, marginesy jak kafelki), w nim wyśrodkowany w poziomie `Image` z `require('@/assets/images/car.png')`: `width: '80%'` (na pełnej szerokości auto było za duże), `aspectRatio` z proporcji pliku, `flexShrink: 1` (na niskim ekranie auto się zmniejsza zamiast wjechać na kafelki), `resizeMode="contain"`. Bez opakowania obrazek dostaje szerokość z pliku (309) i stoi przy lewej krawędzi zamiast na środku.
+3. Odstęp pod autem (do kafelków) jest połową odstępu nad nim — auto bliżej kafelków: `marginTop: 36` (2 × 18 nad kafelkami) i dwa puste `View` dzielące wolne miejsce 2:1 nad i pod autem, więc proporcja zgadza się na każdej wysokości ekranu.
+4. WEBCAR bliżej górnego wiersza: `paddingTop` w `logoRow` 16 zamiast 34 z makiety 08.
+
+**Gotowe, gdy:**
+
+- [ ] auto widać na Home w całości, bez obcięcia i rozciągnięcia, bez tła wokół
+- [ ] kafelki i DRIVE zostają na swoim miejscu
+- [ ] zrzut ekranu w PR
+
 ## Czego potrzebujecie od Wojtasa i Wojtka i kiedy
 
 Aplikacja do końca Sprintu 1 nie potrzebuje auta, ale od Sprintu 2 każda funkcja musi być sprawdzona na prawdziwym ESP32. Wiersze są w kolejności, w jakiej aplikacja ich potrzebuje.
@@ -952,6 +968,11 @@ Największe ryzyko to opóźniony firmware — dlatego symulator jest w pierwszy
 Jeśli w Sprincie 3 zabraknie czasu na całą aplikację: wymagania z sekcji 10 (sterowanie, wideo, telemetria, profile, historia sesji, dźwięk i światło) są nienaruszalne. Pierwszymi kandydatami do uproszczenia są tryb GYRO, rysunek auta na Home i dopracowanie animacji.
 
 ## Zmiany w tej wersji
+
+### 1.24 (24 XI) — B10: rysunek auta na Home
+
+- **Nowe zadanie B10 (issue #53):** rysunek auta na Home — PNG z przezroczystym tłem w trzech rozmiarach, `Image` z `resizeMode="contain"`. Robi A w uzgodnieniu z Jagodą (Home to moduł B). Zamiast „do rozpisania w Sprincie 2” z wersji 1.22.
+- **Układ Home względem makiety 08:** WEBCAR bliżej górnego wiersza (`paddingTop` 16 zamiast 34), auto bliżej kafelków (odstęp pod autem to połowa odstępu nad nim).
 
 ### 1.23 (24 XI) — przycisk menu w tym samym miejscu na wszystkich ekranach
 
