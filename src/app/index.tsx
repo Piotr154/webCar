@@ -7,7 +7,7 @@ import { useConnection } from '@/state/ConnectionContext';
 import { useProfiles } from '@/state/ProfileContext';
 import { colors, space } from '@/theme';
 import { router } from 'expo-router';
-import { Pressable, StyleSheet, View } from 'react-native';
+import { Image, Pressable, StyleSheet, View } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 
 export default function HomeScreen() {
@@ -35,7 +35,15 @@ export default function HomeScreen() {
         </Heading>
       </Pressable>
 
-      <View style={styles.car} />
+      <View style={styles.car}>
+        <View style={styles.carGapTop} />
+        <Image
+          source={require('@/assets/images/car.png')}
+          style={styles.carImage}
+          resizeMode="contain"
+        />
+        <View style={styles.carGapBottom} />
+      </View>
 
       <View style={styles.tiles}>
         <View style={styles.tileRow}>
@@ -111,7 +119,7 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     alignItems: 'center',
     gap: space.m,
-    paddingTop: 34,
+    paddingTop: 16,
     paddingHorizontal: space.l,
   },
   logoBar: {
@@ -123,14 +131,20 @@ const styles = StyleSheet.create({
   // Ujemny margines: Heading 88 bez lineHeight ma wysoki wiersz z pustym miejscem
   // nad i pod literami — zmniejszamy miejsce w układzie, litery zostają całe.
   logo: { letterSpacing: -0.88, marginVertical: -28 },
-  // Miejsce na rysunek auta, bez tła (auto bezpośrednio na tle ekranu):
-  // zajmuje miejsce, które zostało, najwyżej 250 (makieta).
+  // Rysunek auta bez tła (auto bezpośrednio na tle ekranu): zajmuje miejsce,
+  // które zostało, najwyżej 250. Odstęp nad autem jest 2× większy niż pod nim
+  // (aż do kafelków): stałe 36 = 2 × 18 nad kafelkami, wolne miejsce dzielone 2:1.
   car: {
     flex: 1,
     maxHeight: 250,
-    marginTop: 26,
+    marginTop: 36,
     marginHorizontal: space.l,
+    alignItems: 'center',
   },
+  carGapTop: { flex: 2 },
+  carGapBottom: { flex: 1 },
+  // Proporcje car.png (309×118); flexShrink zmniejsza auto na niskim ekranie.
+  carImage: { width: '80%', aspectRatio: 309 / 118, flexShrink: 1 },
   tiles: { paddingTop: 18, paddingHorizontal: space.l, gap: space.s },
   tileRow: { flexDirection: 'row', gap: space.s },
   tile: { flex: 1 },
