@@ -1,6 +1,6 @@
 # WebCar — aplikacja mobilna: podział pracy i plan Sprintu 1
 
-Stan: 22 listopada 2026 · wersja dokumentu 1.17 · zgodna z kontekstem v2.33 i makietami z 3 XI (lista zmian na końcu)
+Stan: 24 listopada 2026 · wersja dokumentu 1.18 · zgodna z kontekstem v2.34 i makietami z 3 XI (lista zmian na końcu)
 
 ## W skrócie
 
@@ -164,7 +164,7 @@ export function setLed(on: 0 | 1): void;              // stan taśmy; ponawiany 
 
 // src/state/ConnectionContext.tsx — A
 useConnection(): { status: ConnStatus; bars: 0 | 1 | 2 | 3 | 4; pingMs: number | null;
-                   telemetry: TelMsg | null; fw: string | null; send; retryNow }
+                   telemetry: TelMsg | null; send; retryNow }
 
 // src/db/profiles.ts — właściciel B
 export type Profile = { id: number; name: string; steering: 'STICK' | 'GYRO'; camera: boolean;
@@ -187,7 +187,7 @@ useProfiles(): { profiles: Profile[]; activeProfile: Profile | null;
 | W2 | Protokół v1 uzgodniony z Wojtasem i Wojtkiem | A+B | — | Musi | Gotowe |
 | A1 | Typy protokołu i `config.ts` | A | W1, W2 | Musi | Gotowe |
 | A2 | Symulator auta | A | A1 | Musi | Gotowe |
-| A3 | Moduł łączności | A | A1, A2 | Musi | Do zrobienia |
+| A3 | Moduł łączności | A | A1, A2 | Musi | W toku |
 | A4 | Ping i wskaźnik jakości łącza | A | A3 | Musi | Do zrobienia |
 | A5 | `ConnectionProvider` i `useConnection` | A | A3, A4 | Musi | Do zrobienia |
 | A6 | Synchronizacja po połączeniu (profil, radio, LED) | A | A3, B4 | Musi | Do zrobienia |
@@ -406,15 +406,15 @@ useProfiles(): { profiles: Profile[]; activeProfile: Profile | null;
 
 1. `src/connection/connection.ts` jako zwykły moduł, nie komponent. Zmienne na poziomie modułu: `ws`, `status`, `lastTelAt`, `reconnectTimer`, zbiory słuchaczy (`Set`).
 2. `startConnection()` wołana raz w `src/app/_layout.tsx`. Flaga `started` chroni przed podwójnym startem po Fast Refresh.
-3. `connect()`: `const socket = new WebSocket(CAR_WS_URL); ws = socket;`. W `onmessage` — `parseCarMessage`; dla `tel` ustaw `lastTelAt = Date.now()` i wywołaj słuchaczy; dla `hello` zapamiętaj `fw`.
-4. `onclose` i `onerror`: najpierw `if (socket !== ws) return;` (zdarzenia starego gniazda ignorujemy), potem `ws = null` i `scheduleReconnect()`.
-5. `scheduleReconnect()` — tylko jeden timer naraz: jeśli `reconnectTimer` istnieje, nic nie rób; inaczej `setTimeout(connect, RECONNECT_DELAY_MS)`.
+3. `connect()`: `const socket = new WebSocket(CAR_WS_URL); ws = socket; lastTelAt = 0;` (telemetria starego gniazda nie daje `online` nowemu). W `onmessage` — `parseCarMessage`; dla `tel` ustaw `lastTelAt = Date.now()` i wywołaj słuchaczy; dla `hello` zaloguj `fw` (żaden ekran go nie pokazuje, więc moduł go nie przechowuje).
+4. `onclose` i `onerror` (jedna funkcja dla obu): najpierw `if (socket !== ws) return;` (zdarzenia starego gniazda ignorujemy), potem `ws = null` i `scheduleReconnect()`. Tak samo `onmessage` ignoruje stare gniazdo.
+5. `scheduleReconnect()`: `setTimeout(connect, RECONNECT_DELAY_MS)`, timer zapisany w `reconnectTimer`. Jeden timer naraz gwarantuje sprawdzenie `socket !== ws` z kroku 4: po pierwszym zdarzeniu `ws` jest `null`, więc drugie (np. `onclose` po `onerror`) nic nie robi.
 6. Status: `setInterval` co 250 ms. `ws` otwarte i `Date.now() - lastTelAt < TEL_LOST_MS` → `online`, inaczej `offline`. Słuchaczy `onStatusChange` wołaj tylko przy zmianie.
-7. `retryNow()`: wyczyść timer, odepnij handlery starego gniazda (`old.onclose = null` itd.), `old.close()`, `connect()`.
+7. `retryNow()` (RETRY w okienku CONNECTION LOST, makieta 06): wyczyść timer, ustaw `ws = null`, potem `old.close()` — kolejność ważna: `onclose` starego gniazda trafi na `socket !== ws` i nie zaplanuje ponownego łączenia. Na koniec `connect()`.
 8. `send(msg)`: gdy `ws?.readyState === WebSocket.OPEN` → `ws.send(JSON.stringify(msg))` i `true`; inaczej `false`.
 9. `onTelemetry` i `onStatusChange` dodają funkcję do zbioru i zwracają funkcję, która ją usuwa.
-10. `AppState` z `react-native`: przejście w tło → zamknij gniazdo tak jak w `retryNow` (odpięte handlery, wyczyszczony timer), ale bez ponownego łączenia, i zatrzymaj ping. Failsafe zatrzyma auto, a firmware zgasi taśmę (sekcja 6) — tak ma być. Powrót → `connect()`.
-11. Logi z prefiksem `[conn]`: open, close, hello fw=…, reconnect.
+10. `AppState` z `react-native`: przejście w tło → zamknij gniazdo tak jak w `retryNow` (wyczyszczony timer, `ws = null`, `close()`), ale bez ponownego łączenia, i zatrzymaj ping. Failsafe zatrzyma auto, a firmware zgasi taśmę (sekcja 6) — tak ma być. Powrót → `connect()`, tylko gdy aplikacja była w `background` (flaga `inBackground`): iOS przechodzi przez `inactive` (np. centrum sterowania) bez zamykania połączenia, a ponowne łączenie otworzyłoby wtedy drugie gniazdo.
+11. Logi z prefiksem `[conn]`: open, close (tylko gdy połączenie się wcześniej otworzyło — nieudane próby nie dublują logów), hello fw=…, reconnect, online / offline, background.
 
 **Gotowe, gdy (test z symulatorem):**
 
@@ -475,7 +475,7 @@ useProfiles(): { profiles: Profile[]; activeProfile: Profile | null;
 **Po co:** ekrany B dostają stan połączenia jednym hookiem, bez przerysowywania ekranu przy każdej ramce telemetrii (10 razy na sekundę).
 
 1. `src/state/ConnectionContext.tsx`: provider subskrybuje moduł; ostatnia telemetria w `useRef`.
-2. `setInterval` co 250 ms liczy `{ status, bars, pingMs, telemetry, fw }` (jak w kontrakcie) i robi `setState` tylko przy zmianie — najwyżej 4 odświeżenia na sekundę.
+2. `setInterval` co 250 ms liczy `{ status, bars, pingMs, telemetry }` (jak w kontrakcie) i robi `setState` tylko przy zmianie — najwyżej 4 odświeżenia na sekundę.
 3. `useConnection()` zwraca ten stan oraz `send` i `retryNow`.
 4. Provider wstawiasz do `src/app/_layout.tsx` — to plik B, więc uzgodnij zmianę.
 5. Na Sprint 2: ekran jazdy reaguje na `as` i `es` natychmiast, więc subskrybuje `onTelemetry` bezpośrednio, nie przez kontekst.
@@ -946,6 +946,12 @@ Największe ryzyko to opóźniony firmware — dlatego symulator jest w pierwszy
 Jeśli w Sprincie 3 zabraknie czasu na całą aplikację: wymagania z sekcji 10 (sterowanie, wideo, telemetria, profile, historia sesji, dźwięk i światło) są nienaruszalne. Pierwszymi kandydatami do uproszczenia są tryb GYRO, rysunek auta na Home i dopracowanie animacji.
 
 ## Zmiany w tej wersji
+
+### 1.18 (24 XI) — A3: moduł łączności w toku
+
+- **A3 w toku:** `src/connection/connection.ts` i `startConnection()` w `_layout.tsx`. Kryteria „Gotowe, gdy” sprawdzimy razem z A4 — bez pingu symulator zamyka połączenie po 2–3 s, więc na samym A3 widać pętlę open → close → reconnect.
+- **Kontrakt `useConnection()` bez `fw`:** żaden ekran z makiet nie pokazuje wersji firmware. Moduł tylko loguje ją przy `hello`. Zmienione: kontrakt, A3 krok 3, A5 krok 2.
+- **A3 prostsze:** stare gniazdo odrzuca tylko sprawdzenie `socket !== ws` (bez odpinania handlerów), a ono samo gwarantuje jeden timer ponownego łączenia (bez osobnego warunku w `scheduleReconnect`). Powrót z tła łączy ponownie tylko po `background`, nie po `inactive`. Zmienione: A3 kroki 3–5, 7, 10 i 11.
 
 ### 1.17 (22 XI) — uproszczenia komponentów B6
 
