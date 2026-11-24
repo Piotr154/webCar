@@ -1,6 +1,6 @@
 # WebCar — aplikacja mobilna: podział pracy i plan Sprintu 1
 
-Stan: 24 listopada 2026 · wersja dokumentu 1.19 · zgodna z kontekstem v2.35 i makietami z 3 XI (lista zmian na końcu)
+Stan: 24 listopada 2026 · wersja dokumentu 1.20 · zgodna z kontekstem v2.36 i makietami z 3 XI (lista zmian na końcu)
 
 ## W skrócie
 
@@ -188,7 +188,7 @@ useProfiles(): { profiles: Profile[]; activeProfile: Profile | null;
 | W2 | Protokół v1 uzgodniony z Wojtasem i Wojtkiem | A+B | — | Musi | Gotowe |
 | A1 | Typy protokołu i `config.ts` | A | W1, W2 | Musi | Gotowe |
 | A2 | Symulator auta | A | A1 | Musi | Gotowe |
-| A3 | Moduł łączności | A | A1, A2 | Musi | W toku |
+| A3 | Moduł łączności | A | A1, A2 | Musi | Gotowe |
 | A4 | Ping i wskaźnik jakości łącza | A | A3 | Musi | W toku |
 | A5 | `ConnectionProvider` i `useConnection` | A | A3, A4 | Musi | Do zrobienia |
 | A6 | Synchronizacja po połączeniu (profil, radio, LED) | A | A3, B4 | Musi | Do zrobienia |
@@ -423,7 +423,7 @@ useProfiles(): { profiles: Profile[]; activeProfile: Profile | null;
 - [ ] klawisz `k` → aplikacja łączy się ponownie w ok. 1–2 s
 - [ ] symulator zatrzymany (Ctrl+C) → `offline` po 2 s, próby co 1 s bez zalewania logów; ponowny start symulatora → `online` samo
 - [ ] po kilku Fast Refresh w konsoli symulatora nie pojawia się `zamykam poprzednie połączenie` (aplikacja nie otwiera drugiego połączenia)
-- [ ] aplikacja w tle → `FAILSAFE` i `LED OFF` w symulatorze (jeśli taśma była włączona); powrót → `online`
+- [ ] aplikacja w tle → `[conn] background`; powrót → `online`. `FAILSAFE` w symulatorze sprawdza A7 (wymaga ramek `drv`), a `LED OFF` — Sprint 2 (taśmę włącza dopiero przycisk LED albo ekran Light & sound)
 
 ### A4 — Ping i wskaźnik jakości łącza
 
@@ -950,6 +950,11 @@ Największe ryzyko to opóźniony firmware — dlatego symulator jest w pierwszy
 Jeśli w Sprincie 3 zabraknie czasu na całą aplikację: wymagania z sekcji 10 (sterowanie, wideo, telemetria, profile, historia sesji, dźwięk i światło) są nienaruszalne. Pierwszymi kandydatami do uproszczenia są tryb GYRO, rysunek auta na Home i dopracowanie animacji.
 
 ## Zmiany w tej wersji
+
+### 1.20 (24 XI) — A3 gotowe
+
+- **A3 gotowe:** test z symulatorem na iPhonie przeszedł (start, klawisze `k` i `p`, wyłączony symulator, Fast Refresh, aplikacja w tle). Centrum sterowania nie przerywa połączenia (`inactive`), centrum powiadomień tak (`background`) — zgodnie z zasadą „w tle → rozłączenie”.
+- **Kryterium A3 „aplikacja w tle”:** `FAILSAFE` przeniesione do A7 (symulator wypisuje go tylko po ramkach `drv`), `LED OFF` do Sprintu 2 (w Sprincie 1 taśma nigdy się nie włącza).
 
 ### 1.19 (24 XI) — A4: ping i wskaźnik łącza w toku
 
