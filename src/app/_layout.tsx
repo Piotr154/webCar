@@ -13,10 +13,12 @@ import { StatusBar } from 'expo-status-bar';
 import { useEffect } from 'react';
 import { GestureHandlerRootView } from 'react-native-gesture-handler';
 
+import { startConnection } from '@/connection/connection';
 import { ProfileProvider } from '@/state/ProfileContext';
 import { colors } from '@/theme';
 
 SplashScreen.preventAutoHideAsync();
+startConnection();
 
 export default function RootLayout() {
   const [loaded, error] = useFonts({
