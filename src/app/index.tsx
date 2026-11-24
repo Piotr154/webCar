@@ -4,6 +4,7 @@ import { MenuButton } from '@/components/MenuButton';
 import { PrimaryButton } from '@/components/PrimaryButton';
 import { SignalBars } from '@/components/SignalBars';
 import { Heading, Label } from '@/components/Typography';
+import { useConnection } from '@/state/ConnectionContext';
 import { useProfiles } from '@/state/ProfileContext';
 import { colors, space } from '@/theme';
 import { router } from 'expo-router';
@@ -13,11 +14,7 @@ import { useSafeAreaInsets } from 'react-native-safe-area-context';
 export default function HomeScreen() {
   const { activeProfile } = useProfiles();
   const insets = useSafeAreaInsets();
-  // TODO(A5): zamienić na const connection = useConnection();
-  const connection: { status: 'online' | 'offline'; bars: number } = {
-    status: 'offline',
-    bars: 0,
-  };
+  const connection = useConnection();
 
   return (
     <View style={[styles.screen, { paddingTop: insets.top + space.xl }]}>

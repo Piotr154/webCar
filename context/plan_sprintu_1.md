@@ -1,6 +1,6 @@
 # WebCar — aplikacja mobilna: podział pracy i plan Sprintu 1
 
-Stan: 24 listopada 2026 · wersja dokumentu 1.20 · zgodna z kontekstem v2.36 i makietami z 3 XI (lista zmian na końcu)
+Stan: 24 listopada 2026 · wersja dokumentu 1.21 · zgodna z kontekstem v2.37 i makietami z 3 XI (lista zmian na końcu)
 
 ## W skrócie
 
@@ -158,14 +158,16 @@ export function retryNow(): void;
 export function onTelemetry(cb: (t: TelMsg) => void): () => void;       // zwraca funkcję wypisania
 export function onStatusChange(cb: (s: ConnStatus) => void): () => void;
 export function getPingAvg(): number | null;          // średnia z 3 ostatnich RTT; null = brak pomiaru (— MS)
+export function getStatus(): ConnStatus;              // bieżący status (provider pyta co 250 ms)
 
 // src/connection/sync.ts — właściciel A (zadanie A6)
 export function syncActiveProfile(): Promise<void>;   // cfg aktywnego profilu + sprawdzenie radia
 export function setLed(on: 0 | 1): void;              // stan taśmy; ponawiany po połączeniu
 
 // src/state/ConnectionContext.tsx — A
-useConnection(): { status: ConnStatus; bars: 0 | 1 | 2 | 3 | 4; pingMs: number | null;
-                   telemetry: TelMsg | null; send; retryNow }
+useConnection(): { status: ConnStatus; bars: 0 | 1 | 2 | 3 | 4 }
+// pingMs, telemetry, send, retryNow dojdą w zadaniach, które ich użyją (Sprint 2–3);
+// send i retryNow można też importować wprost z connection.ts
 
 // src/db/profiles.ts — właściciel B
 export type Profile = { id: number; name: string; steering: 'STICK' | 'GYRO'; camera: boolean;
@@ -189,8 +191,8 @@ useProfiles(): { profiles: Profile[]; activeProfile: Profile | null;
 | A1 | Typy protokołu i `config.ts` | A | W1, W2 | Musi | Gotowe |
 | A2 | Symulator auta | A | A1 | Musi | Gotowe |
 | A3 | Moduł łączności | A | A1, A2 | Musi | Gotowe |
-| A4 | Ping i wskaźnik jakości łącza | A | A3 | Musi | W toku |
-| A5 | `ConnectionProvider` i `useConnection` | A | A3, A4 | Musi | Do zrobienia |
+| A4 | Ping i wskaźnik jakości łącza | A | A3 | Musi | Gotowe |
+| A5 | `ConnectionProvider` i `useConnection` | A | A3, A4 | Musi | Gotowe |
 | A6 | Synchronizacja po połączeniu (profil, radio, LED) | A | A3, B4 | Musi | Do zrobienia |
 | A7 | Prototyp ekranu jazdy (multi-touch, 20 Hz, skręt stopniowy) | A | A3, B3 | Musi | Do zrobienia |
 | A8 | Testy jednostkowe (Jest) | A | A4, A7 | Może poczekać | Do zrobienia |
@@ -201,7 +203,7 @@ useProfiles(): { profiles: Profile[]; activeProfile: Profile | null;
 | B5 | `ProfileProvider` i `useProfiles` | B | B4 | Musi | Gotowe |
 | B6 | Komponenty bazowe | B | B1, B2 | Musi | Gotowe |
 | B7 | Ekran Menu (09) | B | B3, B6 | Musi | Gotowe |
-| B8 | Ekran Home (08, 08A) | B | B5, B6, A5 | Musi | Gotowe, czeka na A5 |
+| B8 | Ekran Home (08, 08A) | B | B5, B6, A5 | Musi | Gotowe |
 | B9 | Ekran `/dev` — katalog komponentów | B | B6 | Może poczekać | Gotowe |
 | W3 | Test na sprzęcie: hotspot + ESP32 + aplikacja | A+B | A3, firmware | Musi | Do zrobienia |
 | W4 | Demo, retro, plan Sprintu 2 | A+B | wszystkie | Musi | Do zrobienia |
@@ -476,16 +478,16 @@ Klawisze `l` i `w` symulatora sprawdzamy w A5 — dopiero wtedy Home pokazuje kr
 
 **Po co:** ekrany B dostają stan połączenia jednym hookiem, bez przerysowywania ekranu przy każdej ramce telemetrii (10 razy na sekundę).
 
-1. `src/state/ConnectionContext.tsx`: provider subskrybuje moduł; ostatnia telemetria w `useRef`.
-2. `setInterval` co 250 ms liczy `{ status, bars, pingMs, telemetry }` (jak w kontrakcie) i robi `setState` tylko przy zmianie — najwyżej 4 odświeżenia na sekundę.
-3. `useConnection()` zwraca ten stan oraz `send` i `retryNow`.
+1. `src/state/ConnectionContext.tsx`: provider subskrybuje `onTelemetry`; RSSI i czas ostatniej ramki w `useRef` (bez renderu przy każdej ramce).
+2. `setInterval` co 250 ms liczy `{ status, bars }` — `status` z `getStatus()`, `bars` z `computeLinkBars(rssi, getPingAvg(), czas od ostatniej ramki)` — i robi `setState` tylko przy zmianie (funkcja w `setState` zwraca poprzedni obiekt, gdy nic się nie zmieniło). Provider pyta o status zamiast słuchać `onStatusChange`, bo montuje się dopiero po załadowaniu czcionek i mógłby przegapić przejście na `online`.
+3. `useConnection()` zwraca ten stan; poza providerem rzuca błąd (jak `useProfiles()`).
 4. Provider wstawiasz do `src/app/_layout.tsx` — to plik B, więc uzgodnij zmianę.
 5. Na Sprint 2: ekran jazdy reaguje na `as` i `es` natychmiast, więc subskrybuje `onTelemetry` bezpośrednio, nie przez kontekst.
 
 **Gotowe, gdy:**
 
 - [ ] B używa `useConnection()` na Home
-- [ ] `console.count` na Home pokazuje najwyżej ok. 4 rendery na sekundę
+- [ ] tymczasowy `console.log` w `HomeScreen` pokazuje najwyżej ok. 4 rendery na sekundę (`console.count` nie trafia do terminala Metro)
 - [ ] symulator, klawisz `l` → po ok. 1,5–2 s jedna kreska na Home (średnia z 3 pingów co 0,5 s); ponownie `l` → wraca do 4 (kryterium z A4)
 - [ ] klawisz `w` → jedna kreska na Home (kryterium z A4)
 
@@ -950,6 +952,14 @@ Największe ryzyko to opóźniony firmware — dlatego symulator jest w pierwszy
 Jeśli w Sprincie 3 zabraknie czasu na całą aplikację: wymagania z sekcji 10 (sterowanie, wideo, telemetria, profile, historia sesji, dźwięk i światło) są nienaruszalne. Pierwszymi kandydatami do uproszczenia są tryb GYRO, rysunek auta na Home i dopracowanie animacji.
 
 ## Zmiany w tej wersji
+
+### 1.21 (24 XI) — A4, A5 i B8 gotowe
+
+- **A5 gotowe:** `src/state/ConnectionContext.tsx` z `ConnectionProvider` (w `_layout.tsx`, nad `ProfileProvider`) i `useConnection()`; Home używa go zamiast stałego `offline`. Test z symulatorem: ONLINE z 4 kreskami, `w` → 1 kreska, `l` → 4, 3, 2, 1 w ok. 1,5 s (średnia z 3 pingów rośnie stopniowo), `p` → OFFLINE; rendery Home tylko przy zmianie stanu.
+- **A4 i B8 gotowe:** kryteria z klawiszami `l` i `w` oraz ONLINE / OFFLINE na Home sprawdzone razem z A5.
+- **Kontrakt `useConnection()` okrojony do `{ status, bars }`:** tylko tego używa Home; `pingMs`, `telemetry`, `send` i `retryNow` dojdą w zadaniach, które ich użyją. Uzgodnione z Jagodą.
+- **Kontrakt `connection.ts` z `getStatus()`:** provider pyta o status co 250 ms, bo montuje się po załadowaniu czcionek i mógłby przegapić przejście na `online`.
+- **Kryterium renderów w A5:** `console.log` zamiast `console.count` — ten drugi nie trafia do terminala Metro.
 
 ### 1.20 (24 XI) — A3 gotowe
 

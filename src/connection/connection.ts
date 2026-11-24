@@ -142,6 +142,10 @@ export function send(msg: AppToCar): boolean {
   return true;
 }
 
+export function getStatus(): ConnStatus {
+  return status;
+}
+
 export function getPingAvg(): number | null {
   if (rtts.length === 0 || Date.now() - lastPongAt > PING_TIMEOUT_MS)
     return null;
