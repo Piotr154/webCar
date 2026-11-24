@@ -110,7 +110,9 @@ const styles = StyleSheet.create({
     backgroundColor: colors.accent,
     transform: [{ skewX: '-12deg' }],
   },
-  brand: { flex: 1 },
+  // Heading 38 bez lineHeight ma wiersz ok. 60 — ujemny margines zmniejsza go do 48,
+  // żeby ✕ stał w tym samym miejscu co MenuButton na Home.
+  brand: { flex: 1, marginVertical: -6 },
   close: {
     width: 48,
     height: 48,
