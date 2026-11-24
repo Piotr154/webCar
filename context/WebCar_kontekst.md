@@ -1,6 +1,6 @@
 # WebCar — kontekst projektu
 
-Stan: 24 listopada 2026 · wersja dokumentu 2.34
+Stan: 24 listopada 2026 · wersja dokumentu 2.35
 
 ## 0. Jak korzystać z tego dokumentu
 
@@ -445,7 +445,8 @@ Zadania i ich opis: plan Sprintu 1 (`context/plan_sprintu_1.md`). A = Piotrek (j
 | A1 | Typy protokołu i `config.ts` | A | gotowe: `src/connection/protocol.ts` (typy wiadomości z sekcji 9, `parseCarMessage` sprawdza tylko pole `t`), `src/config.ts` (adresy i stałe z sekcji 12; IP symulatora z `Constants.expoConfig.hostUri`) |
 | A2 | Symulator auta | A | gotowe: `tools/mock-car/server.js` (Node + `ws`, port 8080, `/ws`): `hello`, `tel` 10 Hz, `pong`, E-STOP i blokada auto-stopu w `drv`, failsafe 300 ms, nowe połączenie zastępuje stare, zamknięcie połączenia po 2 s bez wiadomości i `LED OFF` po zamknięciu; klawisze scenariuszy testowych w `tools/mock-car/README.md` |
 | A3 | Moduł łączności | A | w toku: `src/connection/connection.ts` — `startConnection()` (wołana raz w `_layout.tsx`, flaga `started` przeciw Fast Refresh), ponowne łączenie co 1 s, status `online` / `offline` co 250 ms (gniazdo otwarte i telemetria młodsza niż 2 s), `send`, `retryNow`, `onTelemetry`, `onStatusChange`; zamknięcie w tle, ponowne łączenie po powrocie z `background`. Zdarzenia starego gniazda odrzuca `socket !== ws`. `fw` z `hello` tylko w logu. Kryteria do sprawdzenia razem z A4 (bez pingu symulator zamyka połączenie po 2–3 s) |
-| A4–A8 | ping, provider, sync, prototyp jazdy, testy | A | nierozpoczęte |
+| A4 | Ping i wskaźnik jakości łącza | A | w toku: w `connection.ts` ping co 0,5 s przez `send()` (bez otwartego gniazda, także w tle, nie idzie), 3 ostatnie RTT zerowane przy nowym połączeniu, pingi bez odpowiedzi usuwane po 3 s, `getPingAvg()` — średnia albo `null` („— MS”) bez pomiarów lub po 3 s bez `pong`; `src/connection/linkQuality.ts` z `computeLinkBars` (8 przypadków z planu sprawdzonych skryptem). `pingColor` — Sprint 2 (kafelek pingu na ekranie jazdy). Klawisze `l` i `w` sprawdzimy w A5 |
+| A5–A8 | provider, sync, prototyp jazdy, testy | A | nierozpoczęte |
 | B1 | Czcionki i test kursywy | B | scalone do `main` (PR #3): ładowanie czcionek, test na iPhonie (kursywa przez `skewX`), `Typography.tsx`; ekran `/dev` pokazuje `Heading`, `Label` i `Mono` |
 | B2 | Motyw `theme.ts` | B | scalone do `main` (PR #2): `src/theme.ts`, ekrany i `ScreenStub` używają `colors.*` i `space.*` |
 | B3 | Nawigacja i ekrany-zaślepki | B | gotowe: `_layout.tsx` ze `Stack`, `GestureHandlerRootView`, `StatusBar` i blokadą pionu (`PORTRAIT_UP` przy starcie); `menu` jako `transparentModal` + `fade` z przezroczystym tłem, `drive` z `gestureEnabled: false`; płytki stos przez `navigateFromMenu(href)` w `src/navigation.ts` (`dismissAll` + `push`, stos zawsze Home → wybrany ekran). Tymczasowo: w `ScreenStub` „‹ WSTECZ” (przez `useCanGoBack()`); Menu z makiety 09 — B7, Home z makiety 08 — B8. Uwaga: w SDK 58 nie ma paczki `@react-navigation/native` — hooki nawigacji (`useCanGoBack`, `useNavigation`) importujemy z `expo-router` |
