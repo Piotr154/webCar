@@ -7,6 +7,7 @@ import {
   type ReactNode,
 } from 'react';
 
+import { syncActiveProfile } from '@/connection/sync';
 import {
   createProfile,
   deleteProfile,
@@ -64,7 +65,7 @@ export function ProfileProvider({ children }: { children: ReactNode }) {
   async function activate(id: number) {
     await setActiveProfile(id);
     await reload();
-    // TODO(A6): await syncActiveProfile();
+    await syncActiveProfile();
   }
 
   async function create(name: string) {
@@ -87,7 +88,7 @@ export function ProfileProvider({ children }: { children: ReactNode }) {
     await updateProfile(id, changes);
     await reload();
     if (id === activeProfile?.id) {
-      // TODO(A6): await syncActiveProfile();
+      await syncActiveProfile();
     }
   }
 
