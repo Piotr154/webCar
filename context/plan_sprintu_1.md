@@ -1,6 +1,6 @@
 # WebCar — aplikacja mobilna: podział pracy i plan Sprintu 1
 
-Stan: 25 listopada 2026 · wersja dokumentu 1.25 · zgodna z kontekstem v2.41 i makietami z 3 XI (lista zmian na końcu)
+Stan: 28 listopada 2026 · wersja dokumentu 1.26 · zgodna z kontekstem v2.42 i makietami z 3 XI (lista zmian na końcu)
 
 ## W skrócie
 
@@ -18,7 +18,7 @@ Stan: 25 listopada 2026 · wersja dokumentu 1.25 · zgodna z kontekstem v2.41 i 
 
 ## Co jest w repo i co z tego wynika
 
-Projekt aplikacji istnieje (Expo SDK 58): gotowe są ekrany Home z rysunkiem auta (B8, B10), Menu (B7) i `/dev` (B9), pozostałe są jeszcze zaślepkami; gotowe są też typy protokołu (A1), symulator auta (A2), łączność z pingiem i wskaźnikiem łącza (A3–A5), baza z profilami (B4, B5) i komponenty bazowe (B6) — aktualny stan prac jest w sekcji 8 kontekstu. Firmware ma tylko blokujący program testowy, a protokół v1.0 jest zamrożony (sekcja 9 kontekstu), ale firmware go jeszcze nie obsługuje. Dlatego aplikację trzeba na początku pisać pod symulator auta, a nie pod prawdziwe ESP32.
+Projekt aplikacji istnieje (Expo SDK 58): gotowe są ekrany Home z rysunkiem auta (B8, B10), Menu (B7) i `/dev` (B9), pozostałe są jeszcze zaślepkami; gotowe są też typy protokołu (A1), symulator auta (A2), łączność z pingiem i wskaźnikiem łącza (A3–A5), synchronizacja po połączeniu (A6), baza z profilami (B4, B5) i komponenty bazowe (B6) — aktualny stan prac jest w sekcji 8 kontekstu. Firmware ma tylko blokujący program testowy, a protokół v1.0 jest zamrożony (sekcja 9 kontekstu), ale firmware go jeszcze nie obsługuje. Dlatego aplikację trzeba na początku pisać pod symulator auta, a nie pod prawdziwe ESP32.
 
 | Plik | Zawartość | Znaczenie dla aplikacji |
 |---|---|---|
@@ -193,7 +193,7 @@ useProfiles(): { profiles: Profile[]; activeProfile: Profile | null;
 | A3 | Moduł łączności | A | A1, A2 | Musi | Gotowe |
 | A4 | Ping i wskaźnik jakości łącza | A | A3 | Musi | Gotowe |
 | A5 | `ConnectionProvider` i `useConnection` | A | A3, A4 | Musi | Gotowe |
-| A6 | Synchronizacja po połączeniu (profil, radio, LED) | A | A3, B4 | Musi | Do zrobienia |
+| A6 | Synchronizacja po połączeniu (profil, radio, LED) | A | A3, B4 | Musi | Gotowe |
 | A7 | Prototyp ekranu jazdy (multi-touch, 20 Hz, skręt stopniowy) | A | A3, B3 | Musi | Do zrobienia |
 | A8 | Testy jednostkowe (Jest) | A | A4, A7 | Może poczekać | Do zrobienia |
 | B1 | Czcionki i test kursywy | B | W1 | Musi | Gotowe |
@@ -499,8 +499,8 @@ Klawisze `l` i `w` symulatora sprawdzamy w A5 — dopiero wtedy Home pokazuje kr
 **Po co:** sekcja 7 — po każdym połączeniu auto dostaje ustawienia aktywnego profilu i właściwy stan podświetlenia. Źródłem prawdy jest zawsze profil w telefonie.
 
 1. `src/connection/sync.ts`: `profileToCfg(p: Profile): CfgMsg` — `limit` ← `powerLimit`, `stop` ← `autostopCm`, `blk` ← `blinkers ? 1 : 0`, `led` ← `ledColor`, `bri` ← `brightness`, `vol` ← `volume`, `horn` ← `horn`.
-2. `syncActiveProfile()`: `const p = await getActiveProfile(); send(profileToCfg(p));` (zawsze wszystkie pola), zapamiętaj `p` i ustaw flagę `radioCheck = true`.
-3. Przy pierwszej ramce `tel` po ustawieniu flagi: `radioCheck = false`; jeśli `tel.r !== p.radio`, wyślij `{ t: 'act', a: 'radio', n: p.radio }`. Przy równych wartościach nic — utwór, który już gra, nie zaczyna się od nowa.
+2. `syncActiveProfile()`: `const p = await getActiveProfile(); send(profileToCfg(p));` (zawsze wszystkie pola) i `pendingRadio = p.radio` — stacja do sprawdzenia; `null` = nic nie sprawdzamy.
+3. Przy pierwszej ramce `tel`, gdy `pendingRadio !== null`: jeśli `tel.r !== pendingRadio`, wyślij `{ t: 'act', a: 'radio', n: pendingRadio }`, potem `pendingRadio = null`, więc kolejne ramki nic nie robią. Przy równych wartościach nic — utwór, który już gra, nie zaczyna się od nowa.
 4. `setLed(on)`: zapamiętaj `ledOn = on` i wyślij `{ t: 'act', a: 'led', on }`. Bez połączenia `send` zwraca `false` — nic nie szkodzi, stan pójdzie przy synchronizacji. Na start `ledOn = 0`, bo poza ekranem jazdy i Light & sound taśma ma być zgaszona (sekcja 7). W Sprincie 2 wołają ją przycisk LED i koniec sesji (A) oraz wejście i wyjście z ekranu Light & sound (B).
 5. `startSync()` wołana raz obok `startConnection()` (ta sama ochrona przed Fast Refresh): subskrybuje `onStatusChange` — przy każdym przejściu na `online` wywołuje `syncActiveProfile()` i wysyła `act led` z bieżącym `ledOn`; subskrybuje `onTelemetry` dla kroku 3.
 6. B wywołuje `syncActiveProfile()` po aktywacji profilu (B5), a w Sprincie 2 także po każdej zmianie aktywnego profilu na ekranach ustawień (autozapis, sekcja 7). Ta sama funkcja wysyła wtedy `cfg` i, gdy trzeba, `act radio`.
@@ -963,11 +963,17 @@ Największe ryzyko to opóźniony firmware — dlatego symulator jest w pierwszy
 | Adresy hotspotu inne niż `172.20.10.x` | aplikacja nie znajdzie auta | test W3; zmiana to jedna stała w firmware i jedna w `config.ts` |
 | WebView nie zgłasza zerwania strumienia kamery | CAMERA CONNECTION LOST (05A) się nie pokaże, obraz tylko zamarznie | sprawdzić przy uruchomieniu kamery; obejście z sekcji 12: co 3 s odpytywać `http://172.20.10.14/status` |
 | Expo wyda nowe SDK, a Expo Go na iPhonie się zaktualizuje | projekt przestaje się otwierać w Expo Go | aktualizacja projektu (`npx expo install expo@latest`, potem `npx expo install --fix`) — zarezerwujcie na to 2 h, gdyby się zdarzyło |
-| Sprint 1 za duży | niedokończone fundamenty | tnijcie w tej kolejności: B9, A8, A6 (przechodzi do Sprintu 2); W3 zależy od firmware |
+| Sprint 1 za duży | niedokończone fundamenty | tnijcie A8 (przechodzi do Sprintu 2); W3 zależy od firmware |
 
 Jeśli w Sprincie 3 zabraknie czasu na całą aplikację: wymagania z sekcji 10 (sterowanie, wideo, telemetria, profile, historia sesji, dźwięk i światło) są nienaruszalne. Pierwszymi kandydatami do uproszczenia są tryb GYRO i dopracowanie animacji.
 
 ## Zmiany w tej wersji
+
+### 1.26 (28 XI) — A6: synchronizacja po połączeniu
+
+- **A6 gotowe:** status w tabeli zadań i lista gotowych rzeczy w „Co jest w repo”.
+- **Opis A6, kroki 2–3:** zamiast zapamiętanego profilu `p` i flagi `radioCheck` jedna zmienna `pendingRadio` (stacja z profilu albo `null`), zerowana przy pierwszej ramce `tel`. Zachowanie bez zmian.
+- **Ryzyka:** przy zbyt dużym Sprincie 1 do przesunięcia zostało tylko A8 (B9 i A6 gotowe).
 
 ### 1.25 (25 XI) — porządki po A3–A5 i B10
 

@@ -14,12 +14,14 @@ import { useEffect } from 'react';
 import { GestureHandlerRootView } from 'react-native-gesture-handler';
 
 import { startConnection } from '@/connection/connection';
+import { startSync } from '@/connection/sync';
 import { ConnectionProvider } from '@/state/ConnectionContext';
 import { ProfileProvider } from '@/state/ProfileContext';
 import { colors } from '@/theme';
 
 SplashScreen.preventAutoHideAsync();
 startConnection();
+startSync();
 
 export default function RootLayout() {
   const [loaded, error] = useFonts({
